@@ -11,6 +11,8 @@ etag master ChangedAt
   update;
   delete;
   action cancel_travel;
+  validation validateDescription on save {create;update; field Description;}
+  validation validateCustomer on save {create; field CustomerId;}
 
   field ( mandatory : create ) AgencyId, TravelId;
   field ( readonly: update ) AgencyId, TravelId;

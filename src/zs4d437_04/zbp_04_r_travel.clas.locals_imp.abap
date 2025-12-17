@@ -8,6 +8,10 @@ CLASS lhc_travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING REQUEST requested_authorizations FOR Travel RESULT result.
     METHODS cancel_travel FOR MODIFY
       IMPORTING keys FOR ACTION Travel~cancel_travel.
+    METHODS validateDescription FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateDescription.
+    METHODS validateCustomer FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateCustomer.
 
 ENDCLASS.
 
@@ -36,7 +40,7 @@ CLASS lhc_travel IMPLEMENTATION.
 
   METHOD cancel_travel.
 
-    READ ENTITIES OF Z04_R_TRAVEL IN LOCAL MODE
+    READ ENTITIES OF z04_r_travel IN LOCAL MODE
       ENTITY travel
        ALL FIELDS
        WITH CORRESPONDING #( keys )
@@ -44,16 +48,55 @@ CLASS lhc_travel IMPLEMENTATION.
 
     LOOP AT travels INTO DATA(travel).
       IF travel-Status NE 'C'.
-        MODIFY ENTITIES OF Z04_R_TRAVEL IN LOCAL MODE
+        MODIFY ENTITIES OF z04_r_travel IN LOCAL MODE
           ENTITY travel
             UPDATE FIELDS ( status )
             WITH VALUE #(  ( %tky = travel-%tky status = 'C' ) ).
       ELSE.
         APPEND VALUE #( %tky = travel-%tky ) TO failed-travel.
         APPEND VALUE #( %tky = travel-%tky
-                        %msg = NEW /LRN/CM_S4D437( textid = /LRN/CM_S4D437=>already_canceled
+                        %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>already_canceled
                                                    travelid = travel-TravelID
                                                    severity = if_abap_behv_message=>severity-error ) ) TO reported-travel.
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD validateDescription.
+
+    READ ENTITIES OF z04_r_travel IN LOCAL MODE
+      ENTITY travel
+       FIELDS ( Description )
+       WITH CORRESPONDING #( keys )
+       RESULT DATA(travels).
+
+    LOOP AT travels INTO DATA(travel).
+      IF travel-Description IS INITIAL.
+        APPEND VALUE #( %tky = travel-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = travel-%tky
+                        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                        %element-Description = if_abap_behv=>mk-on )
+          TO reported-travel.
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD validateCustomer.
+    READ ENTITIES OF Z04_R_Travel IN LOCAL MODE
+      ENTITY Travel
+       FIELDS ( CustomerId )
+       WITH CORRESPONDING #( keys )
+       RESULT DATA(travels).
+
+    LOOP AT travels INTO DATA(travel).
+      IF travel-CustomerId IS INITIAL.
+        APPEND VALUE #( %tky = travel-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = travel-%tky
+                        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                        %element-CustomerId = if_abap_behv=>mk-on )
+          TO reported-travel.
       ENDIF.
     ENDLOOP.
 

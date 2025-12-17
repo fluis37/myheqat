@@ -23,7 +23,9 @@ define root view entity Z00_C_Travel
           useForValidation: true,
           label: 'Customer'
       }]
+      
       CustomerId,
+
       BeginDate,
       EndDate,
       Status,

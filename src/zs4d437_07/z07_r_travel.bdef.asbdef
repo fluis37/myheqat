@@ -10,10 +10,38 @@ etag master ChangedAt
   create ( authorization : global );
   update;
   delete;
-  field ( readonly ) Status,ChangedAt,ChangedBy;
+  field ( readonly ) Status, ChangedAt, ChangedBy;
   field ( readonly : update, mandatory : create ) AgencyId, TravelId;
   field ( mandatory ) Description, CustomerId, BeginDate, EndDate;
   action cancel_travel;
+
+  validation validateDescription on save
+  {
+    create;
+    field Description;
+  }
+
+  validation validateCustomer on save
+  {
+    create;
+    field CustomerId;
+  }
+
+  validation validateBeginDate on save
+  {
+    create;
+    field BeginDate;
+  }
+  validation validateEndDate on save
+  {
+    create;
+    field EndDate;
+  }
+  validation validateDateSequence on save
+  {
+    create;
+    field BeginDate, EndDate;
+  }
 
   mapping for z07_travel corresponding
     {

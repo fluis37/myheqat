@@ -12,8 +12,11 @@ CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS cancel_travel FOR MODIFY
       IMPORTING keys FOR ACTION Travel~cancel_travel.
+
     METHODS validateDescription FOR VALIDATE ON SAVE
       IMPORTING keys FOR Travel~validateDescription.
+    METHODS validateCustomer FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateCustomer.
 
 ENDCLASS.
 
@@ -63,14 +66,50 @@ CLASS lhc_Travel IMPLEMENTATION.
                                             v1       = travel-TravelID ) )
         TO reported-travel.
         APPEND VALUE #( %tky = travel-%tky
-                        %msg = NEW ZCM_08_travel( textid = ZCM_08_TRAVEL=>already_canceled ) )
+                        %msg = NEW ZCM_08_travel( textid = zcm_08_travel=>already_canceled ) )
         TO reported-travel.
       ENDIF.
     ENDLOOP.
 
   ENDMETHOD.
 
+* Control Description before save
   METHOD validateDescription.
+    READ ENTITIES OF z08_r_travel IN LOCAL MODE
+         ENTITY Travel
+          FIELDS ( description )
+          WITH CORRESPONDING #(  keys )
+         RESULT DATA(lt_travel).
+
+    LOOP AT lt_travel INTO DATA(ls_travel).
+      IF ls_travel-Description IS INITIAL.
+        APPEND VALUE #( %key = ls_travel-%key ) TO failed-travel.
+        APPEND VALUE #( %tky = ls_travel-%tky %msg = NEW ZCM_08_travel( textid = zcm_08_travel=>field_empty )
+                        %element-Description = if_abap_behv=>mk-on )
+        TO reported-travel.
+
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD validateCustomer.
+    READ ENTITIES OF z08_r_travel IN LOCAL MODE ENTITY Travel FIELDS ( CustomerId )
+    WITH CORRESPONDING #( keys ) RESULT DATA(travels).
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-CustomerId IS INITIAL.
+        APPEND VALUE #( %tky = <travel>-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                        %element-CustomerId = if_abap_behv=>mk-on )
+        TO reported-travel.
+
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437(
+            textid = /lrn/cm_s4d437=>customer_not_exist
+                    customerid = <travel>-CustomerId )
+                    %element-CustomerId = if_abap_behv=>mk-on ) TO reported-travel.
+
+      ENDIF.
+    ENDLOOP.
 
   ENDMETHOD.
 

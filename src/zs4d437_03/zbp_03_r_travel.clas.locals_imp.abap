@@ -9,6 +9,8 @@ CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
 
     METHODS cancel_travel FOR MODIFY
       IMPORTING keys FOR ACTION Travel~cancel_travel.
+    METHODS validateDescription FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateDescription.
 
 ENDCLASS.
 
@@ -63,6 +65,28 @@ CLASS lhc_Travel IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
 
+  ENDMETHOD.
+
+  METHOD validateDescription.
+
+    READ ENTITIES OF Z03_R_Travel IN LOCAL MODE
+        ENTITY Travel
+        FIELDS ( Description )
+        WITH CORRESPONDING #( keys )
+        RESULT DATA(lt_travels).
+
+    LOOP AT lt_travels ASSIGNING FIELD-SYMBOL(<lfs_travel>).
+
+      IF <lfs_travel>-Description IS INITIAL.
+        APPEND VALUE #( %tky = <lfs_travel>-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = <lfs_travel>-%tky
+                        %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>field_empty )
+                        %element-Description = if_abap_behv=>mk-on )
+                        TO reported-travel.
+
+      ENDIF.
+
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.

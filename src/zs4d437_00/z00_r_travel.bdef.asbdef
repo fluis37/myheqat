@@ -24,7 +24,31 @@ etag master ChangedAt
   action cancel_travel;
 
   // Validations
-  validation validateCustomer on save { create; field CustomerId; }
+  validation validateDescription on save
+  { create;
+    field Description;
+  }
+
+  validation validateCustomer on save
+  { create;
+    field CustomerId;
+  }
+
+  validation validateBeginDate on save
+  { create;
+    field BeginDate;
+  }
+
+  validation validateEndDate on save
+  { create;
+    field EndDate;
+  }
+
+  validation validateDateSequence on save
+  { create;
+    field BeginDate,
+    EndDate;
+  }
 
   //Mapping
   mapping for z00_travel corresponding

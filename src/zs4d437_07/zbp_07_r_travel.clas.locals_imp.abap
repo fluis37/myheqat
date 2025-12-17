@@ -8,6 +8,18 @@ CLASS lhc_Z07_R_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING REQUEST requested_authorizations FOR Travel RESULT result.
     METHODS cancel_travel FOR MODIFY
       IMPORTING keys FOR ACTION Travel~cancel_travel.
+    METHODS validateDescription FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateDescription.
+    METHODS validateCustomer FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateCustomer.
+    METHODS validateBeginDate FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateBeginDate.
+
+    METHODS validateDateSequence FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateDateSequence.
+
+    METHODS validateEndDate FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateEndDate.
 
 ENDCLASS.
 
@@ -53,6 +65,101 @@ CLASS lhc_Z07_R_Travel IMPLEMENTATION.
         ENDIF.
       ENDLOOP.
     ENDIF.
+  ENDMETHOD.
+
+  METHOD validateDescription.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Travel FIELDS ( Description )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(travels).
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-Description IS INITIAL.
+        APPEND VALUE #( %tky = <travel>-%tky ) TO failed-travel.
+      ENDIF.
+      IF <travel>-Description IS INITIAL.
+        APPEND VALUE #( %tky = <travel>-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky
+                        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                        %element-Description = if_abap_behv=>mk-on )
+                        TO reported-travel.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD validateCustomer.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Travel FIELDS ( CustomerId )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(travels).
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-CustomerId IS INITIAL.
+        APPEND VALUE #( %tky = <travel>-%tky )
+        TO failed-travel. APPEND VALUE #( %tky = <travel>-%tky
+        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+        %element-CustomerId = if_abap_behv=>mk-on )
+        TO reported-travel.
+      ELSE.
+        SELECT SINGLE FROM /dmo/i_customer
+        FIELDS CustomerID
+        WHERE CustomerID = @<travel>-CustomerId
+        INTO @DATA(dummy).
+        IF sy-subrc <> 0.
+          APPEND VALUE #( %tky = <travel>-%tky )
+          TO failed-travel.
+          APPEND VALUE #( %tky = <travel>-%tky
+                          %msg = NEW /lrn/cm_s4d437( textid = /lrn/cm_s4d437=>customer_not_exist
+                                                     customerid = <travel>-CustomerId )
+                          %element-CustomerId = if_abap_behv=>mk-on )
+                          TO reported-travel.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD validateBeginDate.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Travel FIELDS ( BeginDate ) WITH CORRESPONDING #( keys )
+    RESULT DATA(travels). LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-BeginDate IS INITIAL.
+        APPEND VALUE #( %tky = <travel>-%tky )
+TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty ) %element-BeginDate = if_abap_behv=>mk-on )
+        TO reported-travel. ELSEIF <travel>-begindate < cl_abap_context_info=>get_system_date( ).
+        APPEND VALUE #( %tky = <travel>-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>begin_date_past ) %element-Begindate = if_abap_behv=>mk-on )
+        TO reported-travel.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD validateDateSequence.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Travel FIELDS ( BeginDate EndDate ) WITH CORRESPONDING #( keys )
+    RESULT DATA(travels).
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-EndDate < <travel>-BeginDate.
+        APPEND VALUE #( %tky = <travel>-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>dates_wrong_sequence ) %element = VALUE #( BeginDate = if_abap_behv=>mk-on EndDate = if_abap_behv=>mk-on ) )
+        TO reported-travel.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD validateEndDate.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Travel FIELDS ( EndDate ) WITH CORRESPONDING #( keys )
+    RESULT DATA(travels). LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+      IF <travel>-EndDate IS INITIAL.
+        APPEND VALUE #( %tky = <travel>-%tky )
+        TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty ) %element-EndDate = if_abap_behv=>mk-on )
+        TO reported-travel.
+      ELSEIF <travel>-EndDate < cl_abap_context_info=>get_system_date( ).
+        APPEND VALUE #( %tky = <travel>-%tky ) TO failed-travel.
+        APPEND VALUE #( %tky = <travel>-%tky %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>end_date_past ) %element-EndDate = if_abap_behv=>mk-on )
+        TO reported-travel.
+      ENDIF.
+    ENDLOOP.
   ENDMETHOD.
 
 ENDCLASS.

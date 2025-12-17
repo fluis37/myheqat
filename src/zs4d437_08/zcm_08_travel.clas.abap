@@ -20,6 +20,16 @@ CLASS zcm_08_travel DEFINITION
         attr4 TYPE scx_attrname VALUE '',
       END OF already_canceled.
 
+    CONSTANTS:
+      BEGIN OF field_empty,
+        msgid TYPE symsgid VALUE '/LRN/S4D437',
+        msgno TYPE symsgno VALUE '103',
+        attr1 TYPE scx_attrname VALUE '',
+        attr2 TYPE scx_attrname VALUE '',
+        attr3 TYPE scx_attrname VALUE '',
+        attr4 TYPE scx_attrname VALUE '',
+      END OF field_empty.
+
     METHODS constructor
       IMPORTING
         !textid  LIKE if_t100_message=>t100key OPTIONAL

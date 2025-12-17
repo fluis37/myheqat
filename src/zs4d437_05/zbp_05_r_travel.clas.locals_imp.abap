@@ -8,6 +8,8 @@ CLASS lhc_Z05_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
       IMPORTING REQUEST requested_authorizations FOR Travel RESULT result.
     METHODS cancel_travel FOR MODIFY
       IMPORTING keys FOR ACTION Travel~cancel_travel.
+    METHODS validateDescription FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Travel~validateDescription.
 
 ENDCLASS.
 
@@ -57,11 +59,28 @@ CLASS lhc_Z05_Travel IMPLEMENTATION.
 *                                                               travel_id   = <travel>-TravelID
 *                                                               severity    =
       ENDIF.
-*      travel-Status = 'X'.
-*      MODIFY ENTITIES OF Z05_R_Travel IN LOCAL MODE ENTITY Travel
-*      UPDATE FIELDS ( Status )
-*      WITH VALUE #( ( %tky = travel-%tky Status = travel-Status ) )
-*      FAILED failed REPORTED reported.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD validateDescription.
+
+    READ ENTITIES OF Z05_R_Travel IN LOCAL MODE
+          ENTITY travel
+          FIELDS ( description )
+          WITH CORRESPONDING #( keys )
+          RESULT DATA(travels).
+
+    LOOP AT travels ASSIGNING FIELD-SYMBOL(<travel>).
+
+"5.
+      IF <travel>-description IS INITIAL.
+
+        APPEND VALUE #(  %tky = <travel>-%tky ) TO failed-travel.
+
+        APPEND VALUE #( %tky = <travel>-%tky
+                        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                        %element-description = if_abap_behv=>mk-on ) TO reported-travel.
+      ENDIF.
     ENDLOOP.
   ENDMETHOD.
 

@@ -16,6 +16,33 @@ etag master ChangedAt
 
   action cancel_travel;
 
+  validation validateDescription on save
+  { create;
+    field Description;
+  }
+
+  validation validateCustomer on save
+  { create;
+    field CustomerId;
+  }
+
+  validation validateBeginDate on save
+  { create;
+    field BeginDate;
+  }
+
+  validation validateEndDate on save
+  { create;
+    field EndDate;
+  }
+
+  validation validateDateSequence on save
+  { create;
+    field BeginDate,
+    EndDate;
+  }
+
+
   mapping for z09_travel corresponding
     {
       AgencyID   = agency_id;
@@ -26,6 +53,5 @@ etag master ChangedAt
       ChangedAt  = changed_at;
       ChangedBy  = changed_by;
     }
-
 
 }

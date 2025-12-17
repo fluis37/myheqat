@@ -1,7 +1,7 @@
 managed implementation in class zbp_01_r_travel unique;
 strict ( 2 );
 
-define behavior for Z01_R_TRAVEL  alias Travel
+define behavior for Z01_R_TRAVEL alias Travel
 persistent table z01_travel
 lock master
 authorization master ( instance )
@@ -14,23 +14,50 @@ etag master ChangedAt
 
 
   field ( readonly : update, mandatory : create )
-    AgencyId,
-    TravelId;
+  AgencyId,
+  TravelId;
 
   field ( readonly )
-    Status,
-    ChangedAt,
-    ChangedBy;
+  Status,
+  ChangedAt,
+  ChangedBy;
 
   field ( mandatory )
-    Description,
-    CustomerId,
-    BeginDate,
+  Description,
+  CustomerId,
+  BeginDate,
+  EndDate;
+
+  validation validateDescription on save
+  { create;
+    field Description;
+  }
+
+  validation validateCustomer on save
+  { create;
+    field CustomerId;
+  }
+
+  validation validateBeginDate on save
+  { create;
+    field BeginDate;
+  }
+
+  validation validateEndDate on save
+  { create;
+    field EndDate;
+  }
+
+  validation validateDateSequence on save
+  { create;
+    field BeginDate,
     EndDate;
+  }
+
 
   action cancel_travel;
 
-    mapping for z01_travel corresponding
+  mapping for z01_travel corresponding
     {
       AgencyID   = agency_ID;
       TravelID   = travel_id;

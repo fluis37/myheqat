@@ -7,6 +7,7 @@
     sizeCategory: #S,
     dataClass: #MIXED
 }
+
 define view entity Z_Customer00 as select from /DMO/I_Customer_StdVH
 {
     key CustomerID,

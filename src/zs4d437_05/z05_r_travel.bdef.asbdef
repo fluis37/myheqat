@@ -7,13 +7,18 @@ lock master
 authorization master ( instance )
 etag master ChangedAt
 {
+
+//ACTIONS
   action cancel_travel;
+
   //  result [0..1] $self;
   create ( authorization : global );
   update;
   delete;
   field ( readonly ) AgencyId, TravelId;
 
+
+//FIELDS
   field ( readonly )
   Status,
   ChangedAt,
@@ -22,9 +27,19 @@ etag master ChangedAt
   field ( mandatory )
   Description,
   CustomerId,
+
   BeginDate,
   EndDate;
 
+
+//VALIDATIONS
+
+validation validateDescription on save
+  { create;
+    field Description;
+  }
+
+//MAPPING
   mapping for z05_travel
     {
       AgencyId    = agency_id;

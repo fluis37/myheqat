@@ -16,6 +16,17 @@ etag master ChangedAt
   field ( readonly ) Status, AgencyId, TravelId;
   field ( mandatory ) Description, CustomerId, BeginDate, EndDate;
 
+  validation validateDescription on save
+  { create;
+    field Description;
+  }
+
+  validation validateCustomer on save
+  { create;
+    field CustomerId;
+  }
+
+
   mapping for z04_travel corresponding
    {
      AgencyID = agency_id;
