@@ -1,0 +1,4 @@
+@EndUserText.label: 'S4D437 Travel Service Definition'
+define service Z02_Travel {
+  expose Z02_C_Travel;
+}

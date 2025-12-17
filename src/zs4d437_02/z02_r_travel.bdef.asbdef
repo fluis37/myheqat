@@ -1,0 +1,47 @@
+managed implementation in class zbp_02_r_travel unique;
+strict ( 2 );
+
+define behavior for Z02_R_TRAVEL alias Travel
+persistent table z02_travel
+lock master
+authorization master ( instance )
+etag master ChangedAt
+{
+  // Standard Operations
+  create ( authorization : global );
+  update;
+  delete;
+
+  // Feature Control
+  field ( readonly: update, mandatory: create )
+  AgencyId,
+  TravelId;
+
+  field (readonly )
+  Status,
+  ChangedAt,
+  ChangedBy;
+
+  field (mandatory)
+  Description,
+  CustomerId,
+  BeginDate,
+  EndDate;
+
+  // Custom Operations
+  action cancel_travel;
+
+  // mapping
+  mapping for z02_travel {
+    AgencyId = agency_id;
+    BeginDate = begin_date;
+    ChangedAt = changed_at;
+    ChangedBy = changed_by;
+    CustomerId = customer_id;
+    Description = description;
+    EndDate = end_date;
+    Status = status;
+    TravelId = travel_id;
+
+  }
+}

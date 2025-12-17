@@ -1,0 +1,11 @@
+@EndUserText.label: 'Autorisation projection'
+@MappingRole: true
+define role Z07_C_TRAVEL {
+    grant
+        select
+            on
+                Z07_C_TRAVEL
+                    where
+                        inheriting conditions from entity Z07_R_Travel;
+                        
+}

@@ -1,0 +1,10 @@
+@EndUserText.label: 'Access Control on projection view'
+@MappingRole: true
+define role Z02_C_TRAVEL {
+    grant 
+        select
+            on
+                Z02_C_TRAVEL
+                    where inheriting conditions from entity z02_r_travel;
+                        
+}

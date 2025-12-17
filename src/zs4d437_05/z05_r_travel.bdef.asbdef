@@ -1,0 +1,40 @@
+managed implementation in class zbp_05_r_travel unique;
+strict ( 2 );
+
+define behavior for Z05_R_Travel alias Travel
+persistent table z05_travel
+lock master
+authorization master ( instance )
+etag master ChangedAt
+{
+  action cancel_travel;
+  //  result [0..1] $self;
+  create ( authorization : global );
+  update;
+  delete;
+  field ( readonly ) AgencyId, TravelId;
+
+  field ( readonly )
+  Status,
+  ChangedAt,
+  ChangedBy;
+
+  field ( mandatory )
+  Description,
+  CustomerId,
+  BeginDate,
+  EndDate;
+
+  mapping for z05_travel
+    {
+      AgencyId    = agency_id;
+      TravelId    = travel_id;
+      Description = description;
+      CustomerId  = customer_id;
+      BeginDate   = begin_date;
+      Enddate     = end_date;
+      Status      = status;
+      ChangedAt   = changed_at;
+      ChangedBy   = changed_by;
+    }
+}

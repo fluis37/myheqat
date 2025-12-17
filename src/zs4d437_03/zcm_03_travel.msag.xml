@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_MSAG" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <T100A>
+    <ARBGB>ZCM_03_TRAVEL</ARBGB>
+    <MASTERLANG>E</MASTERLANG>
+    <STEXT>Message class travel</STEXT>
+   </T100A>
+   <T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCM_03_TRAVEL</ARBGB>
+     <MSGNR>100</MSGNR>
+     <TEXT>Travel already canceled</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCM_03_TRAVEL</ARBGB>
+     <MSGNR>200</MSGNR>
+     <TEXT>Travel canceled succesfully</TEXT>
+    </T100>
+   </T100>
+  </asx:values>
+ </asx:abap>
+</abapGit>

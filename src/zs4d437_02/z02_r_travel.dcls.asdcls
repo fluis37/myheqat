@@ -1,0 +1,8 @@
+@EndUserText.label: 'Access control on root view'
+@MappingRole: true
+define role Z02_R_TRAVEL {
+    grant 
+        select on Z02_R_TRAVEL
+            where (AgencyID) = aspect pfcg_auth(/LRN/AGCY, /LRN/AGCY, ACTVT = '03' );
+                        
+}

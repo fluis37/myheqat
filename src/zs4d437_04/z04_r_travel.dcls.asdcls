@@ -1,0 +1,11 @@
+@EndUserText.label: 'Access control Z04_R_TRAVEL'
+@MappingRole: true
+define role Z04_R_TRAVEL {
+    grant 
+        select
+            on
+                Z04_R_TRAVEL
+                    where
+                        (AgencyId) = aspect pfcg_auth(/LRN/AGCY, /LRN/AGCY, actvt = '03');
+                        
+}
