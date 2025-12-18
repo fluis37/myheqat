@@ -56,6 +56,12 @@ annotate view Z07_C_Travel with
            identification: [ { position: 60, importance: #LOW } ]
          }
     EndDate;
+    
+    @UI: { 
+        lineItem: [ { position: 35, importance: #LOW } ], 
+        identification: [ { position: 65, importance: #LOW } ] 
+        }
+    Duration;
 
     @UI: {
            lineItem:       [ { position: 10, importance: #HIGH }, 
@@ -71,5 +77,9 @@ annotate view Z07_C_Travel with
 
     @UI.hidden: true
     ChangedBy;
+    
+    @UI.hidden: true
+    LocChangedAt;
+    
 
   }

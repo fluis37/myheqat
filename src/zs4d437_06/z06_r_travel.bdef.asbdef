@@ -1,39 +1,76 @@
 managed implementation in class zbp_06_r_travel unique;
 strict ( 2 );
 
+with draft;
+
 define behavior for Z06_R_Travel alias Travel
-persistent table z06_travel
+persistent table z06_travel ##UNMAPPED_FIELD
+draft table z06_travel_d
 lock master
+total etag ChangedAt
 authorization master ( instance )
-etag master ChangedAt
+etag master LocChangedAt //ChangedAt
+early numbering
 {
   // Standard Operations
   create ( authorization : global );
-  update;
+  //update;
+  update ( features : instance );
   delete;
 
+  // Non Standard Operations
+  //action cancel_travel;
+  action ( features : instance ) cancel_travel;
+
+  // Draft Action
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare
+  {
+    validation validateDescription;
+    validation validateCustomer;
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+  }
+
+
   // Feature Control
-  field ( readonly : update, mandatory : create )
+  //field ( readonly : update, mandatory : create )
+  //AgencyId,
+  //TravelId;
+
+  field ( readonly )
   AgencyId,
   TravelId;
+
   field ( readonly )
   Status,
+  Duration,
   ChangedAt,
-  ChangedBy;
+  ChangedBy,
+  LocChangedAt;
+
   field ( mandatory )
   Description,
-  CustomerId,
-  BeginDate,
+  //CustomerId,
+  //BeginDate,
   EndDate;
 
-  action cancel_travel;
+  field ( features : instance )
+  CustomerId,
+  BeginDate;
 
+
+  // Validations
   validation validateDescription on save
   { create;
     field Description;
   }
 
-   validation validateCustomer on save
+  validation validateCustomer on save
   { create;
     field CustomerId;
   }
@@ -54,15 +91,47 @@ etag master ChangedAt
     EndDate;
   }
 
+  determination determineStatus on modify
+  { create;
+  }
+
+  determination determineDuration on save
+  { field BeginDate,
+    EndDate;
+  }
+
+  determine action adjustDuration
+  {
+    validation validateBeginDate;
+    validation validateEnddate;
+    validation validateDateSequence;
+    determination determineDuration;
+  }
+
+  side effects
+  {
+    determine action adjustDuration
+    executed on field BeginDate,
+    field EndDate
+    affects field Duration,
+        messages;
+  }
+
+  determine action checkCustomer
+  {
+    validation validateCustomer;
+  }
+
   // Mapping
   mapping for z06_travel corresponding
     {
-      AgencyID   = agency_ID;
-      TravelID   = travel_id;
-      CustomerID = customer_id;
-      BeginDate  = begin_date;
-      EndDate    = end_date;
-      ChangedAt  = changed_at;
-      ChangedBy  = changed_by;
+      AgencyID     = agency_ID;
+      TravelID     = travel_id;
+      CustomerID   = customer_id;
+      BeginDate    = begin_date;
+      EndDate      = end_date;
+      ChangedAt    = changed_at;
+      ChangedBy    = changed_by;
+      LocChangedAt = loc_changed_at;
     }
 }

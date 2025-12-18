@@ -41,12 +41,20 @@ CLASS zcm_01_travel IMPLEMENTATION.
     super->constructor(
 *    previous = previous
     ).
+
     CLEAR me->textid.
+
     IF textid IS INITIAL.
-      if_t100_message~t100key = if_t100_message=>default_textid.
+    if_t100_message~t100key = if_t100_message=>default_textid.
     ELSE.
-      if_t100_message~t100key = textid.
+    if_t100_message~t100key = textid.
     ENDIF.
+    IF severity IS INITIAL.
+    if_abap_behv_message~m_severity = if_abap_behv_message~severity-error.
+    ELSE.
+    if_abap_behv_message~m_severity = severity.
+    ENDIF.
+
   ENDMETHOD.
 
 

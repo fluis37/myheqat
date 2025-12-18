@@ -1,55 +1,120 @@
 managed implementation in class zbp_05_r_travel unique;
 strict ( 2 );
+with draft;
 
 define behavior for Z05_R_Travel alias Travel
-persistent table z05_travel
-lock master
+persistent table z05_travel ##UNMAPPED_FIELD
+draft table z05_travel_d // draft table
+//lock master
+lock master total etag ChangedAt
 authorization master ( instance )
-etag master ChangedAt
+//etag master ChangedAt
+etag master LocChangedAt
+early numbering
 {
-
-//ACTIONS
-  action cancel_travel;
-
-  //  result [0..1] $self;
   create ( authorization : global );
-  update;
+  //  update;
+  update ( features : instance );
   delete;
+
+  //ACTIONS
+  //  action cancel_travel;
+  action ( features : instance ) cancel_travel;
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+
+  draft determine action Prepare
+  {
+    validation validateDescription;
+    validation validateCustomer;
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+  }
+
+  //FIELDS
+
   field ( readonly ) AgencyId, TravelId;
 
-
-//FIELDS
   field ( readonly )
   Status,
+  Duration,
   ChangedAt,
-  ChangedBy;
+  ChangedBy,
+  LocChangedAt;
 
   field ( mandatory )
   Description,
-  CustomerId,
 
-  BeginDate,
+  //  CustomerId,
+  //  BeginDate,
   EndDate;
 
+  field ( features : instance )
+  CustomerId,
+  BeginDate;
 
-//VALIDATIONS
 
-validation validateDescription on save
+  //VALIDATIONS
+
+  validation validateDescription on save
   { create;
     field Description;
   }
 
-//MAPPING
+  validation validateCustomer on save
+  { create;
+    field CustomerId;
+  }
+
+  validation validateBeginDate on save
+  { create;
+    field BeginDate;
+  }
+
+  validation validateEndDate on save
+  { create;
+    field EndDate;
+  }
+
+  validation validateDateSequence on save
+  { create;
+    field BeginDate,
+    EndDate;
+  }
+
+
+  //DETERMINATIONS
+  determination determineStatus on modify
+  { create;
+  }
+
+  determination determineDuration on save
+  { field BeginDate,
+    EndDate; }
+
+  //DETERMINE ACTION
+  determine action checkCustomer
+  {
+    validation validateCustomer;
+  }
+
+
+
+  //MAPPING
   mapping for z05_travel
     {
-      AgencyId    = agency_id;
-      TravelId    = travel_id;
-      Description = description;
-      CustomerId  = customer_id;
-      BeginDate   = begin_date;
-      Enddate     = end_date;
-      Status      = status;
-      ChangedAt   = changed_at;
-      ChangedBy   = changed_by;
+      AgencyId     = agency_id;
+      TravelId     = travel_id;
+      Description  = description;
+      CustomerId   = customer_id;
+      BeginDate    = begin_date;
+      Enddate      = end_date;
+      Status       = status;
+      ChangedAt    = changed_at;
+      ChangedBy    = changed_by;
+      LocChangedAt = loc_changed_at;
     }
 }

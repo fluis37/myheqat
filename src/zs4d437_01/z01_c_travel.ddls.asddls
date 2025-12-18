@@ -17,7 +17,13 @@ define root view entity Z01_C_Travel
     CustomerId,
     BeginDate,
     EndDate,
+    @EndUserText.label: 'Duration (days)'
+    Duration,
     Status,
+    @UI.hidden: true
     ChangedAt,
-    ChangedBy
+    @UI.hidden: true
+    ChangedBy, 
+    @UI.hidden: true
+    LocChangedAt
 }

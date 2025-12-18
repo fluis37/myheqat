@@ -1,6 +1,7 @@
 projection;
 strict ( 2 );
-
+use draft;
+use side effects;
 define behavior for Z00_C_Travel alias Travel
 use etag
 {
@@ -8,5 +9,13 @@ use etag
   use update;
   use delete;
 
+  use action Activate;
+  use action Edit;
+  use action Discard;
+  use action Prepare;
+  use action Resume;
+
   use action cancel_travel as CancelTravel;
+  use action checkCustomer;
+  use action adjustDuration;
 }

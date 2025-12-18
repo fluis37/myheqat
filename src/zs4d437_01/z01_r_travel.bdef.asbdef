@@ -1,32 +1,57 @@
 managed implementation in class zbp_01_r_travel unique;
 strict ( 2 );
+with draft;
+
 
 define behavior for Z01_R_TRAVEL alias Travel
-persistent table z01_travel
+persistent table z01_travel ##UNMAPPED_FIELD
+draft table z01_travel_d
 lock master
+total etag ChangedAt
 authorization master ( instance )
 //etag master <field_name>
-etag master ChangedAt
+etag master LocChangedAt
+early numbering
 {
-  create ( authorization : global );
-  update;
+  create ( authorization : global);
+  update ( features : instance );
   delete;
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare
+    {
+    validation validateDescription;
+    validation validateCustomer;
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+    }
 
 
-  field ( readonly : update, mandatory : create )
-  AgencyId,
-  TravelId;
+  action ( features : instance ) cancel_travel;
 
   field ( readonly )
-  Status,
-  ChangedAt,
-  ChangedBy;
+    AgencyId,
+    TravelId;
+
+    field ( readonly )
+    Status,
+    Duration,
+    ChangedAt,
+    ChangedBy,
+    LocChangedAt;
 
   field ( mandatory )
   Description,
-  CustomerId,
-  BeginDate,
+// CustomerId,
+// BeginDate,
   EndDate;
+
+  field ( features : instance )
+    CustomerId,
+    BeginDate;
 
   validation validateDescription on save
   { create;
@@ -54,8 +79,39 @@ etag master ChangedAt
     EndDate;
   }
 
+    determination determineStatus on modify
+    { create;
+    }
 
-  action cancel_travel;
+    determine action checkCustomer
+        {
+        validation validateCustomer;
+        }
+
+
+    determine action adjustDuration
+    {
+    validation validateBeginDate;
+    validation validateEnddate;
+    validation validateDateSequence;
+    determination determineDuration;
+    }
+
+    side effects
+    {
+    determine action adjustDuration
+    executed on field BeginDate,
+    field EndDate
+    affects field Duration,
+    messages;
+    }
+
+
+    determination determineDuration on save
+    { field BeginDate,
+    EndDate;
+    }
+
 
   mapping for z01_travel corresponding
     {
@@ -66,6 +122,7 @@ etag master ChangedAt
       EndDate    = end_date;
       ChangedAt  = changed_at;
       ChangedBy  = changed_by;
+      LocChangedAt  = loc_changed_at;
     }
 
 }

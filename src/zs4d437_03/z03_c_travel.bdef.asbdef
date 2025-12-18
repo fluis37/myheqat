@@ -1,6 +1,7 @@
 projection;
 strict ( 2 );
-
+use draft;
+use side effects;
 define behavior for Z03_C_Travel //alias <alias_name>
 use etag
 {
@@ -8,4 +9,13 @@ use etag
   use update;
   use delete;
   use action cancel_travel;
+
+  use action Activate;
+  use action Resume;
+  use action Discard;
+  use action Edit;
+  use action Prepare;
+  use action checkCustomer;
+  use action adjustDuration;
+
 }

@@ -75,5 +75,10 @@ annotate view Z00_C_Travel with
   @UI.hidden: true
 
   ChangedBy;
+  @UI: {
+         lineItem:       [ { position: 35, importance: #LOW } ],
+         identification: [ { position: 65, importance: #LOW } ]
+       }
+  Duration;
 
 }

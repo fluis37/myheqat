@@ -57,6 +57,12 @@ annotate view Z02_C_Travel with
          }
     EndDate;
 
+    @UI: { 
+            lineItem:       [ { position: 35, importance: #LOW } ], 
+            identification: [ { position: 65, importance: #LOW } ] 
+         }
+    Duration;
+
     @UI: {
            lineItem:       [ { position: 10, importance: #HIGH },
                              { type: #FOR_ACTION, dataAction: 'cancel_travel', label: 'Cancel the Travel' } ],
@@ -70,5 +76,7 @@ annotate view Z02_C_Travel with
 
     @UI.hidden: true
     ChangedBy;
-
+    
+    @UI.hidden: true
+    LocChangedAt;
   }

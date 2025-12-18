@@ -1,4 +1,4 @@
 @EndUserText.label: 'Travel SD'
 define service Z00_C_Travel {
-  expose Z00_C_Travel as Travel;
+  expose Z00_C_Travel as Travelx;
 }

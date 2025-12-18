@@ -6,15 +6,22 @@ persistent table z04_travel
 lock master
 authorization master ( instance )
 etag master ChangedAt
+early numbering
 {
   create ( authorization : global );
-  update;
+  update ( features : instance );
   delete;
 
-  action cancel_travel;
+  action ( features : instance ) cancel_travel;
 
-  field ( readonly ) Status, AgencyId, TravelId;
-  field ( mandatory ) Description, CustomerId, BeginDate, EndDate;
+  field ( readonly ) AgencyId, TravelId;
+  field ( mandatory ) Description, EndDate; // CustomerId, BeginDate,
+  field ( features : instance ) CustomerId, BeginDate;
+
+  determination determineStatus on modify
+  {
+    create;
+  }
 
   validation validateDescription on save
   { create;
@@ -26,6 +33,21 @@ etag master ChangedAt
     field CustomerId;
   }
 
+  validation validateBeginDate on save
+  { create;
+    field BeginDate;
+  }
+
+  validation validateEndDate on save
+  { create;
+    field EndDate;
+  }
+
+  validation validateDateSequence on save
+  { create;
+    field BeginDate,
+    EndDate;
+  }
 
   mapping for z04_travel corresponding
    {

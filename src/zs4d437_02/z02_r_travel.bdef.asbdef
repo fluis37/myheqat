@@ -1,35 +1,82 @@
 managed implementation in class zbp_02_r_travel unique;
 strict ( 2 );
 
+with draft;
+
 define behavior for Z02_R_TRAVEL alias Travel
-persistent table z02_travel
+persistent table z02_travel ##UNMAPPED_FIELD
+draft table z02_travel_d
 lock master
+total etag ChangedAt
 authorization master ( instance )
-etag master ChangedAt
+etag master LocChangedAt
+early numbering
 {
   // Standard Operations
   create ( authorization : global );
-  update;
+  update ( features : instance );
   delete;
 
   // Feature Control
-  field ( readonly: update, mandatory: create )
+//  field ( readonly: update, mandatory: create )
+  field ( readonly )
   AgencyId,
   TravelId;
 
   field (readonly )
   Status,
+  Duration,
   ChangedAt,
-  ChangedBy;
+  ChangedBy,
+  LocChangedAt;
 
   field (mandatory)
   Description,
-  CustomerId,
-  BeginDate,
+//  CustomerId,
+//  BeginDate,
   EndDate;
 
+  field ( features : instance )
+  CustomerId,
+  BeginDate;
+
   // Custom Operations
-  action cancel_travel;
+  action ( features : instance ) cancel_travel;
+
+  determine action checkCustomer {
+    validation validateCustomer;
+  }
+
+  determine action adjustDuration {
+    validation validateBeginDate;
+    validation validateEnddate;
+    validation validateDateSequence;
+
+    determination determineDuration;
+  }
+
+  side effects {
+    determine action adjustDuration
+      executed on field BeginDate,
+                  field EndDate
+      affects field Duration, messages;
+  }
+
+  determination determineDuration on save {
+    field BeginDate, EndDate;
+  }
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare {
+    validation validateDescription;
+    validation validateCustomer;
+    validation validateBeginDate;
+    validation validateEndDate;
+    validation validateDateSequence;
+  }
 
   // mapping
   mapping for z02_travel {
@@ -42,6 +89,7 @@ etag master ChangedAt
     EndDate = end_date;
     Status = status;
     TravelId = travel_id;
+    LocChangedAt = loc_changed_at;
   }
 
   validation validateDescription on save {
@@ -66,7 +114,11 @@ etag master ChangedAt
 
   validation validateDateSequence on save {
     create;
-    field CustomerId;
+    field BeginDate, EndDate;
+  }
+
+  determination determineStatus on modify {
+    create;
   }
 
 }

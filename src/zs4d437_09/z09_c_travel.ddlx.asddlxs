@@ -76,6 +76,12 @@ annotate entity Z09_C_Travel with
 
   @UI.hidden: true
   ChangedBy;
+  
+  @UI: { 
+  lineItem: [{ position: 35, importance: #LOW }],
+  identification: [{ position: 35, importance: #LOW }]
+  }
+  Duration;
 
 
 }

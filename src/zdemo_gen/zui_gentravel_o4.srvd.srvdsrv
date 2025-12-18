@@ -1,0 +1,11 @@
+@EndUserText: {
+  label: 'Service Definition for ZC_00GENTRAVEL'
+}
+@ObjectModel: {
+  leadingEntity: {
+    name: 'ZC_00GENTRAVEL'
+  }
+}
+define service ZUI_GENTRAVEL_O4 provider contracts odata_v4_ui {
+  expose ZC_00GENTRAVEL as Travel;
+}

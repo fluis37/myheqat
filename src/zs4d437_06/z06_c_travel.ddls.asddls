@@ -18,15 +18,15 @@ define root view entity Z06_C_Travel
           entity: {
               name: '/DMO/I_Customer_StdVH',
               element: 'CustomerID'
-          },
-          distinctValues: true,
-          useForValidation: true,
-          label: 'Customer'
+          }
       }]
       CustomerId,
       BeginDate,
       EndDate,
+      @EndUserText.label: 'Duration (days)'
+      Duration,
       Status,
       ChangedAt,
-      ChangedBy
+      ChangedBy,
+      LocChangedAt
 }

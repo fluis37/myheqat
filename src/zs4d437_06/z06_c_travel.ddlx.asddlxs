@@ -57,6 +57,12 @@ annotate entity Z06_C_Travel with
   EndDate;
 
   @UI: {
+  lineItem: [ { position: 35, importance: #LOW } ],
+  identification: [ { position: 65, importance: #LOW } ]
+  }
+  Duration;
+
+  @UI: {
   lineItem: [ { position: 10, importance: #HIGH },
               {
                   type: #FOR_ACTION,
@@ -80,5 +86,8 @@ annotate entity Z06_C_Travel with
 
   @UI.hidden: true
   ChangedBy;
+
+  @UI.hidden: true
+  LocChangedAt;
 
 }

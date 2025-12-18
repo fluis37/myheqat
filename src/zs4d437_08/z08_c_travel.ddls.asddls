@@ -22,7 +22,12 @@ define root view entity Z08_C_TRAVEL
       CustomerId,
       BeginDate,
       EndDate,
+      
+      @EndUserText.label: 'Duration (days)'
+      Duration,
+      
       Status,
       ChangedAt,
-      ChangedBy
+      ChangedBy,
+      LocChangedAt
 }

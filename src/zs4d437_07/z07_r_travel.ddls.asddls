@@ -9,9 +9,12 @@ define root view entity Z07_R_Travel
         customer_id as CustomerId,
         begin_date  as BeginDate,
         end_date    as EndDate,
+        dats_days_between( begin_date, end_date )  as Duration,
         status      as Status,
         @Semantics.systemDateTime.lastChangedAt: true
         changed_at  as ChangedAt,
         @Semantics.user.lastChangedBy: true
-        changed_by  as ChangedBy
+        changed_by  as ChangedBy,
+        @Semantics.systemDateTime.localInstanceLastChangedAt: true
+        loc_changed_at as LocChangedAt
   }
