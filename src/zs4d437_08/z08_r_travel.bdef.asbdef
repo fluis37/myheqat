@@ -4,7 +4,7 @@ strict ( 2 );
 with draft;
 
 define behavior for Z08_R_TRAVEL alias Travel
-persistent table z08_travel ##UNMAPPED_FIELD  // unmapped filed pour la zone Duration
+persistent table z08_travel ##UNMAPPED_FIELD  // unmapped field pour la zone Duration
 draft table z08_travel_d   //mode draft
 lock master
 total etag ChangedAt  //mode draft
@@ -21,9 +21,9 @@ etag master LocChangedAt
 //et le Feature control: field ( readonly ) AgencyId, TravelId;
 early numbering
 
-
-
 {
+  association _TravelItem { create; with draft; }
+
   //Standard actions
   create ( authorization : global );
   //update;
@@ -50,6 +50,8 @@ early numbering
   draft action Activate optimized;  //ne passe pas 2x ds les validations
   draft action Discard;
   draft action Resume;
+  //list of validations that are to be performed during the
+  //draft determine action Prepare of the root entity
   draft determine action Prepare
   {
     validation validateDescription;
@@ -57,9 +59,11 @@ early numbering
     validation validateBeginDate;
     validation validateEndDate;
     validation validateDateSequence;
+
+    validation Item~validateFlightDate;
   }
 
-  //Validation
+  //Validation des champs saisis/modifiés
   validation validateDescription on save
   {
     create;
@@ -105,5 +109,73 @@ early numbering
       LocChangedAt = loc_changed_at;
     }
 
+}
+
+define behavior for Z08_R_TRAVELITEM alias Item
+//persistent table z08_tritem
+//with additional save                  //ajout de la partie additional save
+with unmanaged save
+draft table z08_tritem_d
+authorization dependent by _Travel
+lock dependent by _Travel
+etag master LocChangedAt
+
+{
+  association _Travel { with draft; }
+
+  update;
+  delete;
+
+  //Feature Control
+  field ( readonly, numbering : managed )
+  ItemUuid;  //internal numbering for technical key field ITemUuid
+
+  field ( readonly )
+  AgencyId,
+  TravelId;
+
+  //Validation des champs saisis/modifiés
+  validation validateFlightDate on save
+  { create;
+    field FlightDate;
+  }
+
+  determination determineTravelDates on save
+  {
+    field FlightDate;
+  }
+
+  //Mapping
+  mapping for z08_tritem corresponding
+    {
+      ItemUuid           = item_uuid;
+      AgencyId           = agency_id;
+      TravelId           = travel_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      BookingId          = booking_id;
+      PassengerFirstName = passenger_first_name;
+      PassengerLastName  = passenger_last_name;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      LocChangedAt       = loc_changed_at;
+    }
+
+  mapping for /lrn/437_s_tritem control /lrn/437_s_tritemx corresponding
+    {
+      ItemUuid           = item_uuid;
+      AgencyId           = agency_id;
+      TravelId           = travel_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      BookingId          = booking_id;
+      PassengerFirstName = passenger_first_name;
+      PassengerLastName  = passenger_last_name;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      LocChangedAt       = loc_changed_at;
+    }
 
 }

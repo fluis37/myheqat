@@ -1,5 +1,147 @@
 **********************************************************************
-*
+*Local Types lsc_z08_r_travel  Local Saver Class
+*The local saver class is always meant for the entire business object,
+*not for an individual entity. Therefore, it uses the name of the business object.
+*It must not use travel, because this is the alias name of the root entity,
+*not an alias name for the business object.
+**********************************************************************
+CLASS lsc_z08_r_travel DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_z08_r_travel IMPLEMENTATION.
+
+  METHOD save_modified.
+*   create an instance of the /LRN/CL_S4D437_TRITEM class
+*   and store a reference to the new instance in an inline declared variable model
+    DATA(model) = NEW zCL_08_S4D437_TRITEM( i_table_name = 'Z08_TRITEM' ).
+
+
+    LOOP AT delete-item ASSIGNING FIELD-SYMBOL(<item_d>).
+      model->delete_item( i_uuid = <item_d>-itemuuid ).
+    ENDLOOP.
+
+    LOOP AT create-item ASSIGNING FIELD-SYMBOL(<item_c>).
+
+*     quand les noms des champs sont identiques
+*      model->create_item( i_item = CORRESPONDING #( <item_c> ) ).
+
+*     On utilise le "mapping for /lrn/437_s_tritem" défini dans la behavior definition Z08_R_TRAVEL
+      model->create_item( i_item = CORRESPONDING #( <item_c> MAPPING FROM ENTITY ) ).
+
+    ENDLOOP.
+
+    LOOP AT update-item ASSIGNING FIELD-SYMBOL(<item_u>).
+      model->update_item(
+      i_item = CORRESPONDING #( <item_u> MAPPING FROM ENTITY )
+      i_itemx = CORRESPONDING #( <item_u> MAPPING FROM ENTITY USING CONTROL ) ).
+    ENDLOOP.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+**********************************************************************
+*Local Types lhc_Item   Local Handler Class
+**********************************************************************
+CLASS lhc_item DEFINITION INHERITING FROM cl_abap_behavior_handler.
+
+  PRIVATE SECTION.
+
+    METHODS validateFlightDate FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Item~validateFlightDate.
+    METHODS determineTravelDates FOR DETERMINE ON SAVE
+      IMPORTING keys FOR Item~determineTravelDates.
+
+ENDCLASS.
+
+CLASS lhc_item IMPLEMENTATION.
+
+* Control la validité de la date
+  METHOD validateFlightDate.
+    CONSTANTS c_area TYPE string VALUE `FLIGHTDATE`.
+    READ ENTITIES OF Z08_R_Travel IN LOCAL MODE
+         ENTITY Item
+          FIELDS ( AgencyId TravelId FlightDate )
+          WITH CORRESPONDING #(  keys )
+         RESULT DATA(lt_item).
+
+    LOOP AT lt_item INTO DATA(ls_item).
+      "Vide les précédents messages liés à l'aréa
+      APPEND VALUE #( %tky = ls_item-%tky
+                      %state_area = c_area )
+        TO reported-item.
+      IF ls_item-FlightDate IS INITIAL.
+        APPEND VALUE #( %tky = ls_item-%tky )
+            TO failed-item.
+
+        APPEND VALUE #( %tky = ls_item-%tky
+                        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                        %element-FlightDate = if_abap_behv=>mk-on
+                        %state_area = c_area
+                        %path-travel = CORRESPONDING #( ls_item ) )
+            TO reported-item.
+      ELSEIF ls_item-FlightDate < cl_abap_context_info=>get_system_date( ).
+        APPEND VALUE #( %tky = ls_item-%tky ) TO failed-item.
+        APPEND VALUE #( %tky = ls_item-%tky
+                        %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>flight_date_past )
+                        %element-FlightDate = if_abap_behv=>mk-on
+                        %state_area = c_area
+                        %path-travel = CORRESPONDING #( ls_item ) )
+            TO reported-item.
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+  METHOD determineTravelDates.
+    READ ENTITIES OF Z08_R_Travel IN LOCAL MODE
+      ENTITY Item FIELDS ( FlightDate )
+      WITH CORRESPONDING #( keys )
+      RESULT DATA(items)
+
+      BY \_Travel
+      FIELDS ( BeginDate EndDate )
+      WITH CORRESPONDING #( keys )
+      RESULT DATA(travels)
+      LINK DATA(link).
+
+    LOOP AT items ASSIGNING FIELD-SYMBOL(<item>).
+*      ASSIGN travels[ %tky = link[ source-%tky = <item>-%tky ]-target-%tky ]
+*          TO FIELD-SYMBOL(<travel>).
+
+*      READ TABLE travels ASSIGNING FIELD-SYMBOL(<travel>)
+*            WITH KEY %tky = link[ source-%tky = <item>-%tky ]-target-%tky.
+
+      ASSIGN travels[ KEY id %tky = link[ KEY id source-%tky = <item>-%tky ]-target-%tky ]
+        TO FIELD-SYMBOL(<travel>).
+
+      IF <travel>-EndDate < <item>-FlightDate.
+        <travel>-EndDate = <item>-FlightDate.
+      ENDIF.
+
+      IF <item>-FlightDate > cl_abap_context_info=>get_system_date( )
+      AND <item>-FlightDate < <travel>-BeginDate.
+        <travel>-BeginDate = <item>-FlightDate.
+      ENDIF.
+
+    ENDLOOP.
+
+*   Actualise la table TRAVEL
+    MODIFY ENTITIES OF Z08_R_Travel IN LOCAL MODE
+    ENTITY Travel UPDATE FIELDS ( BeginDate EndDate )
+    WITH CORRESPONDING #( travels ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+**********************************************************************
+*Local Types lhc_Travel
 **********************************************************************
 CLASS lhc_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.

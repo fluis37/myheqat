@@ -3,6 +3,7 @@
 
 define root view entity Z08_R_TRAVEL
   as select from z08_travel
+  composition [0..*] of Z08_R_TRAVELITEM as _TravelItem
 {
   key agency_id   as AgencyId,
   key travel_id   as TravelId,
@@ -16,7 +17,10 @@ define root view entity Z08_R_TRAVEL
       changed_at  as ChangedAt,
       @Semantics.user.lastChangedBy: true
       changed_by  as ChangedBy,
+
 // ajout du champs loc_changed pour le mode draft 
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
-      loc_changed_at as LocChangedAt
+      loc_changed_at as LocChangedAt,
+
+      _TravelItem
 }

@@ -1,5 +1,6 @@
 projection;
 strict ( 2 );
+
 use draft;
 define behavior for Z05_C_Travel alias ZTravel
 {
@@ -21,4 +22,17 @@ define behavior for Z05_C_Travel alias ZTravel
     executed on field customerId
     affects messages;
   }
+
+  use association _TravelItem { create; with draft; }
+}
+
+define behavior for Z05_C_TRAVELITEM
+use etag
+{
+
+  use update;
+  use delete;
+
+  use association _Travel { with draft; }
+
 }

@@ -1,4 +1,5 @@
-@EndUserText.label: 'Service definition'
+@EndUserText.label: 'Flight Travel Service definition'
 define service Z05_TRAVEL {
   expose Z05_C_Travel;
+  expose Z05_C_TRAVELITEM;
 }

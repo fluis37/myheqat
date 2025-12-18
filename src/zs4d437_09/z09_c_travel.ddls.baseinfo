@@ -6,9 +6,14 @@
 "Z09_R_TRAVEL"
 ],
 "ASSOCIATED":
-[],
+[
+"Z09_C_TRAVELITEM",
+"Z09_R_TRAVELITEM"
+],
 "BASE":
-[],
+[
+"Z09_R_TRAVEL"
+],
 "ANNO_REF":
 [],
 "SCALAR_FUNCTION":

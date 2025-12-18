@@ -15,7 +15,14 @@ annotate entity Z08_C_TRAVEL with
                   purpose:       #STANDARD,
                   type:          #IDENTIFICATION_REFERENCE,
                   label:         'Travel',
-                  position:      10 }
+                  position:      10 },
+
+                { id:            'TravelItem',
+                  purpose:       #STANDARD,
+                  type:          #LINEITEM_REFERENCE,
+                  targetElement: '_TravelItem',
+                  label:         'Travel Items',
+                  position:      20 }
              ]
 
   @UI: {

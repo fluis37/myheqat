@@ -30,7 +30,18 @@ use etag
     affects messages;
   }
 
+  use association _TravelItem { create; with draft; }
 
+
+}
+
+define behavior for Z09_C_TRAVELITEM
+use etag
+{
+  use update;
+  use delete;
+
+  use association _Travel { with draft; }
 
 
 }

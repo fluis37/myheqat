@@ -2,6 +2,7 @@
 @EndUserText.label: 'Flight Travel (Data Model)'
 define root view entity Z03_R_Travel
   as select from z03_travel
+  composition [0..*] of Z03_R_TRAVELITEM as _TravelItem
   {
     key agency_id   as AgencyId,
     key travel_id   as TravelId,
@@ -16,5 +17,6 @@ define root view entity Z03_R_Travel
         @Semantics.user.lastChangedBy: true
         changed_by  as ChangedBy,
         @Semantics.systemDateTime.localInstanceLastChangedAt: true
-        loc_change_at as LocChangeAt
+        loc_change_at as LocChangeAt,
+        _TravelItem        
   }

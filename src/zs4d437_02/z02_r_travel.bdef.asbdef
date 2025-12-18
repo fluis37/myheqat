@@ -12,6 +12,8 @@ authorization master ( instance )
 etag master LocChangedAt
 early numbering
 {
+  association _TravelItem { create; with draft; }
+
   // Standard Operations
   create ( authorization : global );
   update ( features : instance );
@@ -76,6 +78,8 @@ early numbering
     validation validateBeginDate;
     validation validateEndDate;
     validation validateDateSequence;
+
+    validation Item~validateFlightDate;
   }
 
   // mapping
@@ -119,6 +123,69 @@ early numbering
 
   determination determineStatus on modify {
     create;
+  }
+
+}
+
+define behavior for Z02_R_TravelItem alias Item
+with unmanaged save
+//persistent table z02_tritem
+//with additional save
+draft table z02_tritem_d
+authorization dependent by _Travel
+lock dependent by _Travel
+etag master LocChangedAt
+{
+  update;
+  delete;
+	
+  association _Travel { with draft; }
+
+  field ( readonly, numbering : managed )
+  ItemUuid;
+
+  field ( readonly )
+  AgencyId,
+  TravelId;
+
+  validation validateFlightDate on save {
+    create;
+    field FlightDate;
+  }
+  determination determineTravelDate on save {
+    field FlightDate;
+  }
+
+  mapping for z02_tritem corresponding
+  {
+	ItemUuid = item_uuid;
+	AgencyId = agency_id;
+	TravelId = travel_id;
+	CarrierId = carrier_id;
+	ConnectionId = connection_id;
+	FlightDate = flight_date;
+	BookingId = booking_id;
+	PassengerFirstName = passenger_first_name;
+	PassengerLastName = passenger_last_name;
+	ChangedAt = changed_at;
+	ChangedBy = changed_by;
+	LocChangedAt = loc_changed_at;
+  }
+  mapping for /lrn/437_s_tritem
+    control /lrn/437_s_tritemx corresponding
+  {
+    ItemUuid = item_uuid;
+    AgencyId = agency_id;
+    TravelId = travel_id;
+    CarrierId = carrier_id;
+    ConnectionId = connection_id;
+    FlightDate = flight_date;
+    BookingId = booking_id;
+    PassengerFirstName = passenger_first_name;
+    PassengerLastName = passenger_last_name;
+    ChangedAt = changed_at;
+    ChangedBy = changed_by;
+    LocChangedAt = loc_changed_at;
   }
 
 }

@@ -26,5 +26,6 @@ define root view entity Z09_C_Travel
       @UI.hidden: true
       ChangedBy,
       @UI.hidden: true
-      LocChangeAt
+      LocChangeAt,
+      _TravelItem : redirected to composition child Z09_C_TRAVELITEM
 }

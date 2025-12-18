@@ -1,3 +1,149 @@
+CLASS lsc_z07_r_travel DEFINITION INHERITING FROM cl_abap_behavior_saver.
+
+  PROTECTED SECTION.
+    METHODS save_modified REDEFINITION.
+
+  PRIVATE SECTION.
+    METHODS map_message
+      IMPORTING i_msg        TYPE symsg
+      RETURNING VALUE(r_msg) TYPE REF TO if_abap_behv_message.
+
+ENDCLASS.
+
+CLASS lsc_z07_r_travel IMPLEMENTATION.
+
+  METHOD save_modified.
+*    DATA(model) = NEW zcl_s4d437_tritem( i_table_name = 'Z07_TRITEM' ).
+    DATA(model) = NEW /LRN/CL_s4d437_tritem( i_table_name = 'Z07_TRITEM' ).
+
+    LOOP AT delete-item ASSIGNING FIELD-SYMBOL(<item_d>).
+      model->delete_item( i_uuid = <item_d>-itemuuid ).
+      DATA(msg_d) = model->delete_item( i_uuid = <item_d>-itemuuid ).
+      IF msg_d IS NOT INITIAL.
+        APPEND VALUE #( %tky-itemuuid = <item_d>-itemuuid
+                        %msg = map_message( msg_d ) )
+          TO reported-item.
+      ENDIF.
+    ENDLOOP.
+    LOOP AT create-item ASSIGNING FIELD-SYMBOL(<item_c>).
+*      model->create_item( i_item = CORRESPONDING #( <item_c> ) ).
+      model->create_item( i_item = CORRESPONDING #( <item_c> MAPPING FROM ENTITY ) ).
+      DATA(msg_c) = model->create_item( i_item = CORRESPONDING #( <item_c> MAPPING FROM ENTITY ) ).
+      IF msg_c IS NOT INITIAL.
+        APPEND VALUE #( %tky-itemuuid = <item_c>-itemuuid
+                        %msg = map_message( msg_c ) )
+        TO reported-item.
+      ENDIF.
+    ENDLOOP.
+
+    LOOP AT update-item ASSIGNING FIELD-SYMBOL(<item_u>).
+      model->update_item( i_item = CORRESPONDING #( <item_u> MAPPING FROM ENTITY )
+                          i_itemx = CORRESPONDING #( <item_u> MAPPING FROM ENTITY USING CONTROL )
+                          ).
+      DATA(msg_u) = model->update_item( i_item = CORRESPONDING #( <item_u> MAPPING FROM ENTITY )
+                                        i_itemx = CORRESPONDING #( <item_u> MAPPING FROM ENTITY USING CONTROL ) ).
+      IF msg_u IS NOT INITIAL.
+        APPEND VALUE #( %tky-itemuuid = <item_u>-itemuuid
+                        %msg = map_message( msg_u ) )
+        TO reported-item.
+      ENDIF.
+    ENDLOOP.
+  ENDMETHOD.
+
+  METHOD map_message.
+    DATA(severity) = SWITCH #( i_msg-msgty
+                                WHEN 'S' THEN if_abap_behv_message=>severity-success
+                                WHEN 'I' THEN if_abap_behv_message=>severity-information
+                                WHEN 'W' THEN if_abap_behv_message=>severity-warning
+                                WHEN 'E' THEN if_abap_behv_message=>severity-error
+                                ELSE if_abap_behv_message=>severity-none ).
+
+    r_msg = new_message( id = i_msg-msgid
+                         number = i_msg-msgno
+                         severity = severity
+                         v1 = i_msg-msgv1
+                         v2 = i_msg-msgv2
+                         v3 = i_msg-msgv3
+                         v4 = i_msg-msgv4 ).
+  ENDMETHOD.
+
+ENDCLASS.
+
+CLASS lhc_item DEFINITION INHERITING FROM cl_abap_behavior_handler.
+
+  PRIVATE SECTION.
+
+    METHODS validateFlightDate FOR VALIDATE ON SAVE
+      IMPORTING keys FOR Item~validateFlightDate.
+    METHODS determineTravelDates FOR DETERMINE ON SAVE
+      IMPORTING keys FOR Item~determineTravelDates.
+
+ENDCLASS.
+
+CLASS lhc_item IMPLEMENTATION.
+
+  METHOD validateFlightDate.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Item
+    FIELDS ( AgencyId TravelId FlightDate )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(items).
+    LOOP AT items ASSIGNING FIELD-SYMBOL(<item>).
+    ENDLOOP.
+    CONSTANTS c_area TYPE string VALUE `FLIGHTDATE`.
+    APPEND VALUE #( %tky = <item>-%tky %state_area = c_area )
+    TO reported-item.
+    IF <item>-FlightDate IS INITIAL.
+      APPEND VALUE #( %tky = <item>-%tky ) TO failed-item.
+      APPEND VALUE #( %tky = <item>-%tky
+                      %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>field_empty )
+                      %element-FlightDate = if_abap_behv=>mk-on
+                      %state_area = c_area
+                      %path-travel = CORRESPONDING #( <item> ) )
+         TO reported-item.
+    ELSEIF <item>-FlightDate < cl_abap_context_info=>get_system_date( ).
+      APPEND VALUE #( %tky = <item>-%tky ) TO failed-item.
+      APPEND VALUE #( %tky = <item>-%tky
+                      %msg = NEW /lrn/cm_s4d437( /lrn/cm_s4d437=>flight_date_past )
+                      %element-FlightDate = if_abap_behv=>mk-on
+                      %state_area = c_area
+                      %path-travel = CORRESPONDING #( <item> ) )
+      TO reported-item.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD determineTravelDates.
+    READ ENTITIES OF Z07_R_Travel IN LOCAL MODE
+    ENTITY Item FIELDS ( FlightDate )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(items)
+    BY \_Travel
+    FIELDS ( BeginDate EndDate )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(travels)
+    LINK DATA(link).
+
+    LOOP AT items ASSIGNING FIELD-SYMBOL(<item>).
+      ASSIGN travels[ %tky = link[ source-%tky = <item>-%tky ]-target-%tky ] TO FIELD-SYMBOL(<travel>).
+      IF <travel>-EndDate < <item>-FlightDate.
+        <travel>-EndDate = <item>-FlightDate.
+      ENDIF.
+
+      IF <item>-FlightDate > cl_abap_context_info=>get_system_date( )
+        AND <item>-FlightDate < <travel>-BeginDate.
+        <travel>-BeginDate = <item>-FlightDate.
+      ENDIF.
+    ENDLOOP.
+
+    MODIFY ENTITIES OF Z07_R_Travel IN LOCAL MODE
+        ENTITY Travel
+        UPDATE FIELDS ( BeginDate EndDate ) WITH CORRESPONDING #( travels ).
+
+  ENDMETHOD.
+
+ENDCLASS.
+
 CLASS lhc_Z07_R_Travel DEFINITION INHERITING FROM cl_abap_behavior_handler.
   PRIVATE SECTION.
 

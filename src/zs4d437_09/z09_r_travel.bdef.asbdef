@@ -16,6 +16,8 @@ early numbering
   update ( features : instance );
   delete;
 
+  association _TravelItem { create; with draft; }
+
   field ( readonly ) Status, Duration, ChangedAt, ChangedBy, LocChangeAt;
   field ( readonly ) AgencyId, TravelId;
   field ( mandatory ) Description, EndDate;
@@ -37,6 +39,7 @@ early numbering
     validation validateBeginDate;
     validation validateEndDate;
     validation validateDateSequence;
+    validation Item~validateFlightDate;
   }
 
 
@@ -109,5 +112,74 @@ early numbering
       ChangedBy   = changed_by;
       LocChangeAt = loc_changed_at;
     }
+
+}
+
+define behavior for Z09_R_TRAVELITEM alias Item
+with unmanaged save
+draft table z09_tritem_d
+
+authorization dependent by _Travel
+lock dependent by _Travel
+etag master LocChangedAt
+{
+
+  update;
+  delete;
+
+  association _Travel { with draft; }
+
+  field ( readonly, numbering : managed )
+  ItemUuid;
+
+  field ( readonly )
+  AgencyId,
+  TravelId;
+
+  validation validateFlightDate on save
+  {
+    create;
+    field FlightDate;
+  }
+
+  determination determineTravelDates on save
+  {
+    field FlightDate;
+  }
+
+//  mapping for z09_tritem corresponding
+//    {
+//      ItemUuid           = item_uuid;
+//      AgencyId           = agency_id;
+//      TravelId           = travel_id;
+//      CarrierId          = carrier_id;
+//      ConnectionId       = connection_id;
+//      FlightDate         = flight_date;
+//      BookingId          = booking_id;
+//      PassengerFirstName = passenger_first_name;
+//      PassengerLastName  = passenger_last_name;
+//      ChangedAt          = changed_at;
+//      ChangedBy          = changed_by;
+//      LocChangedAt       = loc_changed_at;
+//    }
+
+
+  mapping for /lrn/437_s_tritem
+  control /lrn/437_s_tritemx corresponding
+    {
+      ItemUuid           = item_uuid;
+      AgencyId           = agency_id;
+      TravelId           = travel_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      BookingId          = booking_id;
+      PassengerFirstName = passenger_first_name;
+      PassengerLastName  = passenger_last_name;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      LocChangedAt       = loc_changed_at;
+    }
+
 
 }

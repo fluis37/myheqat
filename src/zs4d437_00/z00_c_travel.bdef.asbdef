@@ -18,4 +18,21 @@ use etag
   use action cancel_travel as CancelTravel;
   use action checkCustomer;
   use action adjustDuration;
+
+  use association _TravelItem
+  { create;
+    with draft;
+  }
+}
+define behavior for Z00_C_TravelItem alias Item
+use etag
+{
+
+  use update;
+  use delete;
+
+  use association _Travel
+  {
+    with draft;
+  }
 }

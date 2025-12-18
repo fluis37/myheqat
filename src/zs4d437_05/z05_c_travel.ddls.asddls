@@ -28,5 +28,6 @@ define root view entity Z05_C_Travel
       Status,
       ChangedAt,
       ChangedBy,
-      LocChangedAt //8.0
+      LocChangedAt, //8.0
+      _TravelItem : redirected to composition child Z05_C_TRAVELITEM
 }

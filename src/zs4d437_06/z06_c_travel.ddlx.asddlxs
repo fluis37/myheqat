@@ -10,12 +10,19 @@
      }
 annotate entity Z06_C_Travel with
 {
-  @UI.facet: [ { id:            'Travel',
-                  purpose:       #STANDARD,
-                  type:          #IDENTIFICATION_REFERENCE,
-                  label:         'Travel',
-                  position:      10 }
-             ]
+  @UI.facet: [ { id: 'Travel',
+                  purpose: #STANDARD,
+                  type: #IDENTIFICATION_REFERENCE,
+                  label: 'Travel',
+                  position: 10 },
+                  { id: 'TravelItem',
+                  purpose: #STANDARD,
+                  type: #LINEITEM_REFERENCE,
+                  targetElement: '_TravelItem',
+                  label: 'Travel Items',
+                  position: 20 }
+  ]
+
 
   @UI: {
          identification: [ { position: 10, importance: #LOW } ]

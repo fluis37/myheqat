@@ -26,4 +26,16 @@ use etag
     affects messages; }
 
   use action adjustDuration;
+
+  //la création du TravelITem est gérée ici depuis le roor
+  use association _TravelItem { create; with draft; }
+}
+
+define behavior for Z08_C_TRAVELITEM
+use etag
+{
+    use update;
+    use delete;
+
+    use association _Travel { with draft; }
 }

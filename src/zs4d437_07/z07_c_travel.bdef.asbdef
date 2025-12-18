@@ -8,7 +8,7 @@ use etag
 {
   use create;
   use update;
-//  use delete;
+  //  use delete;
   use action cancel_travel;
   use action checkCustomer;
 
@@ -19,5 +19,15 @@ use etag
   use action Resume;
 
   use action adjustDuration;
+  use association _TravelItem { create; with draft; }
 
+}
+
+define behavior for Z07_C_TravelItem
+use etag
+{
+  use update;
+  use delete;
+
+  use association _Travel { with draft; }
 }

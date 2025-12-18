@@ -19,13 +19,17 @@ define root view entity Z00_C_Travel
               name: '/DMO/I_Customer_StdVH',
               element: 'CustomerID'
           },
-          distinctValues: true,
-          useForValidation: true,
           label: 'Customer'
       }]
-      
+      @ObjectModel: {
+          text: {
+              element: [ 'CustomerName' ]
+          }
+      }
       CustomerId,
-
+      _Customer.CountryCode,
+      
+      CustomerName,
       BeginDate,
       EndDate,
             @EndUserText.label: 'Durations (days)'
@@ -34,5 +38,6 @@ define root view entity Z00_C_Travel
       ChangedAt,
       ChangedBy,
       @UI.hidden: true
-      LocChangedAt
+      LocChangedAt,
+      _TravelItem: redirected to composition child Z00_C_TravelItem
 }

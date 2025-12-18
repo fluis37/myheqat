@@ -21,7 +21,14 @@ annotate entity Z05_C_Travel with
                   purpose:       #STANDARD,
                   type:          #IDENTIFICATION_REFERENCE,
                   label:         'Travel',
-                  position:      10 }
+                  position:      10 },
+
+                  { id:          'TravelItem',
+                  purpose:       #STANDARD,
+                  type:          #LINEITEM_REFERENCE,
+                  targetElement: '_TravelItem',
+                  label:         'Travel Items',
+                  position:      20 }
              ]
 
   @UI: {
@@ -68,13 +75,13 @@ annotate entity Z05_C_Travel with
          identification: [ { position: 70, importance: #HIGH } ]
        }
   Status;
-  
-  @UI: { 
+
+  @UI: {
   lineItem: [{ position: 35, importance:  #LOW } ],
   identification: [{ position: 65, importance:  #LOW }]
   }
   Duration;
-  
+
   @UI.hidden: true
   ChangedAt;
 

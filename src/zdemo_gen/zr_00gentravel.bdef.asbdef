@@ -9,6 +9,7 @@ draft table Z00GENTRAVEL_D
 etag master LocChangedAt
 lock master total etag ChangedAt
 authorization master( global )
+with additional save
 {
   field ( mandatory : create )
    AgencyID,
@@ -25,6 +26,7 @@ authorization master( global )
    AgencyID,
    TravelID;
 
+  event TravelCreated;
 
   create;
   update;

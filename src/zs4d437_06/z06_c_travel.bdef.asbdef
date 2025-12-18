@@ -19,6 +19,9 @@ use etag
 
   use action cancel_travel;
   use action checkCustomer;
+
+  use association _TravelItem { create; with draft; }
+
   side effects
   {
     determine action checkCustomer
@@ -27,4 +30,13 @@ use etag
   }
 
   use action adjustDuration;
+}
+define behavior for Z06_C_TravelItem alias TravelItem
+use etag
+{
+  use update;
+  use delete;
+
+  use association _Travel { with draft; }
+
 }

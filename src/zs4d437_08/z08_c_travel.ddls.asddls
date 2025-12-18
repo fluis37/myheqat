@@ -29,5 +29,9 @@ define root view entity Z08_C_TRAVEL
       Status,
       ChangedAt,
       ChangedBy,
-      LocChangedAt
+      LocChangedAt,
+      
+      //Redirect the association to the projection view for flight travel items and classify it as composition.
+      _TravelItem : redirected to composition child Z08_C_TRAVELITEM
+
 }
