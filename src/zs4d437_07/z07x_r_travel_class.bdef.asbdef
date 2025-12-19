@@ -1,0 +1,15 @@
+extension implementation in class zbp_07x_r_travel_class unique;
+
+extend behavior for Travel
+{
+}
+
+extend behavior for Item
+with additional save
+{
+  validation ZZvalidateClass on save
+  {
+    create;
+    field ZZClassZ07;
+  }
+}

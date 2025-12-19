@@ -1,0 +1,7 @@
+@Metadata.layer: #CUSTOMER
+annotate view Z07_C_TravelItem with
+{
+  @UI: { lineItem: [ { position: 65, importance: #HIGH } ],
+         identification: [ { position: 65, importance: #HIGH } ] }
+  ZZclassZ07;
+}

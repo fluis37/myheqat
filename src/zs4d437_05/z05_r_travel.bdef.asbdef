@@ -1,6 +1,13 @@
 managed implementation in class zbp_05_r_travel unique;
 strict ( 2 );
 with draft;
+extensible
+{
+  with additional save;
+  with validations on save;
+  with determinations on modify;
+  with determinations on save;
+}
 
 define behavior for Z05_R_Travel alias Travel
 persistent table z05_travel ##UNMAPPED_FIELD
@@ -11,6 +18,8 @@ authorization master ( instance )
 //etag master ChangedAt
 etag master LocChangedAt
 early numbering
+with additional save
+extensible
 {
   create ( authorization : global );
   //  update;
@@ -22,12 +31,14 @@ early numbering
   //ACTIONS
   //  action cancel_travel;
   action ( features : instance ) cancel_travel;
+  event TravelCreated parameter Z05_A_Event;
   draft action Edit;
   draft action Activate optimized;
   draft action Discard;
   draft action Resume;
 
   draft determine action Prepare
+  extensible
   {
     validation validateDescription;
     validation validateCustomer;
@@ -106,7 +117,7 @@ early numbering
 
 
   //MAPPING
-  mapping for z05_travel
+  mapping for z05_travel ##unextensible_mapping
     {
       AgencyId     = agency_id;
       TravelId     = travel_id;
@@ -128,6 +139,7 @@ draft table z05_tritem_d
 authorization dependent by _Travel
 lock dependent by _Travel
 etag master LocChangedAt
+extensible
 {
   update;
   delete;
@@ -170,7 +182,8 @@ etag master LocChangedAt
     }
 
   mapping for /lrn/437_s_tritem
-  control /lrn/437_s_tritemx corresponding
+  control /lrn/437_s_tritemx
+  corresponding
     {
       ItemUuid           = item_uuid;
       AgencyId           = agency_id;

@@ -4,6 +4,8 @@ strict ( 2 );
 use draft;
 use side effects;
 
+extensible;
+
 define behavior for Z06_C_Travel alias Travel
 use etag
 {
@@ -33,6 +35,7 @@ use etag
 }
 define behavior for Z06_C_TravelItem alias TravelItem
 use etag
+extensible
 {
   use update;
   use delete;

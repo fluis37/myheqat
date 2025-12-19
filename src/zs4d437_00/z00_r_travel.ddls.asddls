@@ -10,7 +10,7 @@ define root view entity Z00_R_Travel
   key travel_id                                                    as TravelId,
       description                                                  as Description,
       customer_id                                                  as CustomerId,
-      concat_with_space(_Customer.LastName, _Customer.FirstName, 1) as CustomerName,
+      concat_with_space(_Customer.FirstName, _Customer.LastName, 1) as CustomerName,
       begin_date                                                   as BeginDate,
       end_date                                                     as EndDate,
       dats_days_between( begin_date, end_date )                    as Duration,

@@ -1,0 +1,12 @@
+extend view entity Z03_C_TRAVELITEM with {
+    @Consumption: {
+        valueHelpDefinition: [{
+            qualifier: '',
+            entity: {
+                name: '/LRN/437_I_ClassStdVH',
+                element: 'ClassID'
+            }
+        }]
+    }
+    Item.zzClassZ03
+}

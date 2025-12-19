@@ -18,7 +18,7 @@ CLASS lsc_z09_r_travel IMPLEMENTATION.
 
   METHOD save_modified.
 
- DATA(model) = NEW /lrn/cl_s4d437_tritem( i_table_name = 'Z06_TRITEM' ).
+    DATA(model) = NEW /lrn/cl_s4d437_tritem( i_table_name = 'Z09_TRITEM' ).
 
     LOOP AT delete-item ASSIGNING FIELD-SYMBOL(<item_d>).
 
@@ -26,24 +26,18 @@ CLASS lsc_z09_r_travel IMPLEMENTATION.
 
       IF msg_d IS NOT INITIAL.
         APPEND VALUE #( %tky-itemuuid = <item_d>-itemuuid
-                        %msg = map_message( msg_d )
-                      )
-            TO reported-item.
+                        %msg = map_message( msg_d ) ) TO reported-item.
       ENDIF.
 
     ENDLOOP.
 
     LOOP AT create-item ASSIGNING FIELD-SYMBOL(<item_c>).
 
-      DATA(msg_c) = model->create_item(
-                       i_item = CORRESPONDING #( <item_c> MAPPING FROM ENTITY )
-                    ).
+      DATA(msg_c) = model->create_item( i_item = CORRESPONDING #( <item_c> MAPPING FROM ENTITY ) ).
 
       IF msg_c IS NOT INITIAL.
         APPEND VALUE #( %tky-itemuuid = <item_c>-itemuuid
-                        %msg = map_message( msg_c )
-                      )
-            TO reported-item.
+                        %msg = map_message( msg_c ) ) TO reported-item.
       ENDIF.
 
     ENDLOOP.
@@ -53,45 +47,57 @@ CLASS lsc_z09_r_travel IMPLEMENTATION.
       DATA(msg_u) = model->update_item(
                i_item  = CORRESPONDING #( <item_u> MAPPING FROM ENTITY )
                i_itemx = CORRESPONDING #( <item_u> MAPPING FROM ENTITY
-                                                   USING CONTROL )
-             ).
+                                                   USING CONTROL ) ).
 
       IF msg_u IS NOT INITIAL.
         APPEND VALUE #( %tky-itemuuid = <item_u>-itemuuid
-                        %msg = map_message( msg_u )
-                      )
-            TO reported-item.
+                        %msg = map_message( msg_u ) ) TO reported-item.
       ENDIF.
 
     ENDLOOP.
 
-  ENDMETHOD.
+    IF create-travel IS NOT INITIAL.
 
-  METHOD map_message.
-    DATA severity TYPE if_abap_behv_message=>t_severity.
-    CASE i_msg-msgty.
-      WHEN 'S'.
-        severity = if_abap_behv_message=>severity-success.
-      WHEN 'I'.
-        severity = if_abap_behv_message=>severity-information.
-      WHEN 'W'.
-        severity = if_abap_behv_message=>severity-warning.
-      WHEN 'E'.
-        severity = if_abap_behv_message=>severity-error.
-      WHEN OTHERS.
-        severity = if_abap_behv_message=>severity-none.
-    ENDCASE.
+      IF create-travel IS NOT INITIAL. DATA event_in TYPE TABLE FOR EVENT Z09_R_Travel~TravelCreated.
+      LOOP AT create-travel ASSIGNING FIELD-SYMBOL(<new_travel>).
+        APPEND VALUE #( AgencyId = <new_travel>-AgencyId
+                        TravelId = <new_travel>-TravelId
+                        origin = 'Z09_R_TRAVEL' )
+         TO event_in.
+      ENDLOOP.
 
-    r_msg = new_message(
- id = i_msg-msgid
- number = i_msg-msgno
- severity = severity
- v1 = i_msg-msgv1
- v2 = i_msg-msgv2
- v3 = i_msg-msgv3
- v4 = i_msg-msgv4 ).
+      RAISE ENTITY EVENT Z09_R_Travel~TravelCreated
+      FROM CORRESPONDING #( create-travel ) .
+    ENDIF.
 
-  ENDMETHOD.
+  ENDIF.
+
+ENDMETHOD.
+
+METHOD map_message.
+  DATA severity TYPE if_abap_behv_message=>t_severity.
+  CASE i_msg-msgty.
+    WHEN 'S'.
+      severity = if_abap_behv_message=>severity-success.
+    WHEN 'I'.
+      severity = if_abap_behv_message=>severity-information.
+    WHEN 'W'.
+      severity = if_abap_behv_message=>severity-warning.
+    WHEN 'E'.
+      severity = if_abap_behv_message=>severity-error.
+    WHEN OTHERS.
+      severity = if_abap_behv_message=>severity-none.
+  ENDCASE.
+
+  r_msg = new_message( id = i_msg-msgid
+                       number = i_msg-msgno
+                       severity = severity
+                       v1 = i_msg-msgv1
+                       v2 = i_msg-msgv2
+                       v3 = i_msg-msgv3
+                       v4 = i_msg-msgv4 ).
+
+ENDMETHOD.
 
 ENDCLASS.
 

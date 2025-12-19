@@ -3,14 +3,24 @@ strict ( 2 );
 
 with draft;
 
+extensible
+{
+    with additional save;
+    with validations on save;
+    with determinations on modify;
+    with determinations on save;
+}
+
 define behavior for Z02_R_TRAVEL alias Travel
 persistent table z02_travel ##UNMAPPED_FIELD
+with additional save
 draft table z02_travel_d
 lock master
 total etag ChangedAt
 authorization master ( instance )
 etag master LocChangedAt
 early numbering
+extensible
 {
   association _TravelItem { create; with draft; }
 
@@ -45,6 +55,8 @@ early numbering
   // Custom Operations
   action ( features : instance ) cancel_travel;
 
+  event TravelCreated parameter Z02_A_Event;
+
   determine action checkCustomer {
     validation validateCustomer;
   }
@@ -72,7 +84,7 @@ early numbering
   draft action Activate optimized;
   draft action Discard;
   draft action Resume;
-  draft determine action Prepare {
+  draft determine action Prepare extensible {
     validation validateDescription;
     validation validateCustomer;
     validation validateBeginDate;
@@ -83,7 +95,7 @@ early numbering
   }
 
   // mapping
-  mapping for z02_travel {
+  mapping for z02_travel ##unextensible_mapping {
     AgencyId = agency_id;
     BeginDate = begin_date;
     ChangedAt = changed_at;
@@ -135,6 +147,7 @@ draft table z02_tritem_d
 authorization dependent by _Travel
 lock dependent by _Travel
 etag master LocChangedAt
+extensible
 {
   update;
   delete;
@@ -156,7 +169,7 @@ etag master LocChangedAt
     field FlightDate;
   }
 
-  mapping for z02_tritem corresponding
+  mapping for z02_tritem corresponding ##unextensible_mapping
   {
 	ItemUuid = item_uuid;
 	AgencyId = agency_id;
@@ -172,7 +185,7 @@ etag master LocChangedAt
 	LocChangedAt = loc_changed_at;
   }
   mapping for /lrn/437_s_tritem
-    control /lrn/437_s_tritemx corresponding
+    control /lrn/437_s_tritemx corresponding ##unextensible_mapping
   {
     ItemUuid = item_uuid;
     AgencyId = agency_id;

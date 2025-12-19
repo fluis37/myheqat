@@ -1,8 +1,16 @@
 @EndUserText.label: 'Flight Travel Item (Projection)'
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @Metadata.allowExtensions: true
+@AbapCatalog.viewEnhancementCategory: [#PROJECTION_LIST]
+@AbapCatalog.extensibility: {
+ extensible: true,
+ allowNewDatasources: false,
+ dataSources: ['Item'],
+ elementSuffix: 'Z06'
+}
+
 define view entity Z06_C_TravelItem
-  as projection on Z06_R_TravelItem
+  as projection on Z06_R_TravelItem as Item
 {
   key ItemUuid,
       AgencyId,

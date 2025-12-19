@@ -3,6 +3,13 @@ strict ( 2 );
 
 with draft;
 
+extensible {
+with additional save;
+with validations on save;
+with determinations on modify;
+with determinations on save;
+}
+
 define behavior for Z08_R_TRAVEL alias Travel
 persistent table z08_travel ##UNMAPPED_FIELD  // unmapped field pour la zone Duration
 draft table z08_travel_d   //mode draft
@@ -17,10 +24,15 @@ authorization master ( instance )
 //mode draft
 etag master LocChangedAt
 
+//Extension
+extensible
+
 //Numérotation à la sauvegarde via la METHOD earlynumbering_create
 //et le Feature control: field ( readonly ) AgencyId, TravelId;
 early numbering
 
+// pour gérer l'envoi de l'évènement
+with additional save
 {
   association _TravelItem { create; with draft; }
 
@@ -45,6 +57,10 @@ early numbering
   //action cancel_travel;
   action ( features : instance ) cancel_travel;
 
+  //Send an Event
+  //event TravelCreated; //sans paramtre
+  event TravelCreated parameter Z08_A_Event;
+
   //mode draft
   draft action Edit;
   draft action Activate optimized;  //ne passe pas 2x ds les validations
@@ -53,6 +69,7 @@ early numbering
   //list of validations that are to be performed during the
   //draft determine action Prepare of the root entity
   draft determine action Prepare
+  extensible  //ajoute l'extension
   {
     validation validateDescription;
     validation validateCustomer;
@@ -97,7 +114,9 @@ early numbering
         messages; }
 
   //Mapping
-  mapping for z08_travel corresponding
+  //mapping for z08_travel corresponding
+  //pour l'extension on ajoute un pragma pour éviter le warning
+  mapping for z08_travel corresponding  ##unextensible_mapping
     {
       AgencyID     = agency_id;
       TravelID     = travel_id;
@@ -119,6 +138,9 @@ draft table z08_tritem_d
 authorization dependent by _Travel
 lock dependent by _Travel
 etag master LocChangedAt
+
+//Extension
+extensible
 
 {
   association _Travel { with draft; }
@@ -145,6 +167,9 @@ etag master LocChangedAt
     field FlightDate;
   }
 
+
+
+
   //Mapping
   mapping for z08_tritem corresponding
     {
@@ -162,7 +187,9 @@ etag master LocChangedAt
       LocChangedAt       = loc_changed_at;
     }
 
-  mapping for /lrn/437_s_tritem control /lrn/437_s_tritemx corresponding
+  mapping for /lrn/437_s_tritem
+    control /lrn/437_s_tritemx
+    corresponding
     {
       ItemUuid           = item_uuid;
       AgencyId           = agency_id;

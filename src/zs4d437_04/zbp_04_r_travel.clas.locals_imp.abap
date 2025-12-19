@@ -45,6 +45,18 @@ CLASS lsc_z04_r_travel IMPLEMENTATION.
       ENDIF.
     ENDLOOP.
 
+    IF create-travel IS NOT INITIAL.
+      DATA event_in TYPE TABLE FOR EVENT Z04_R_Travel~TravelCreated.
+
+      LOOP AT create-travel INTO DATA(new_travel).
+        APPEND VALUE #( AgencyId = new_travel-AgencyId
+                        TravelId = new_travel-TravelId
+                        origin = 'Z04_R_TRAVEL' ) TO event_in.
+      ENDLOOP.
+
+      RAISE ENTITY EVENT Z04_R_Travel~TravelCreated FROM CORRESPONDING #( create-travel ).
+    ENDIF.
+
   ENDMETHOD.
 
   METHOD map_message.

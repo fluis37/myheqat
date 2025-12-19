@@ -3,6 +3,14 @@ strict ( 2 );
 
 with draft;
 
+extensible
+{
+  with additional save;
+  with validations on save;
+  with determinations on modify;
+  with determinations on save;
+}
+
 define behavior for Z04_R_TRAVEL alias Travel
 persistent table z04_travel ##UNMAPPED_FIELD
 draft table z04_travel_d
@@ -11,10 +19,14 @@ total etag ChangedAt
 authorization master ( instance )
 etag master LocChangedAt // ChangedAt
 early numbering
+extensible
+with additional save
 {
   create ( authorization : global );
   update ( features : instance );
   delete;
+
+  event TravelCreated parameter Z04_A_EVENT;
 
   action ( features : instance ) cancel_travel;
 
@@ -28,6 +40,7 @@ early numbering
   draft action Discard;
   draft action Resume;
   draft determine action Prepare
+  extensible
   {
     validation validateDescription;
     validation validateCustomer;
@@ -95,7 +108,7 @@ early numbering
     messages;
   }
 
-  mapping for z04_travel corresponding
+  mapping for z04_travel corresponding ##unextensible_mapping
    {
      AgencyID = agency_id;
      TravelID = travel_id;
@@ -117,6 +130,7 @@ draft table z04_tritem_d
 authorization dependent by _Travel
 lock dependent by _Travel
 etag master LocChangedAt
+extensible
 {
   update;
   delete;
@@ -138,8 +152,7 @@ etag master LocChangedAt
 
   association _Travel { with draft; }
 
-  mapping for /LRN/437_s_tritem
-  control /LRN/437_s_tritemx corresponding
+  mapping for z04_tritem corresponding ##unextensible_mapping
   {
     ItemUuid = item_uuid;
     AgencyId = agency_id;
@@ -155,19 +168,20 @@ etag master LocChangedAt
     LocChangedAt = loc_changed_at;
   }
 
-//  mapping for z04_tritem corresponding
-//  {
-//    ItemUuid = item_uuid;
-//    AgencyId = agency_id;
-//    TravelId = travel_id;
-//    CarrierId = carrier_id;
-//    ConnectionId = connection_id;
-//    FlightDate = flight_date;
-//    BookingId = booking_id;
-//    PassengerFirstName = passenger_first_name;
-//    PassengerLastName = passenger_last_name;
-//    ChangedAt = changed_at;
-//    ChangedBy = changed_by;
-//    LocChangedAt = loc_changed_at;
-//  }
+  mapping for /LRN/437_s_tritem control /LRN/437_s_tritemx corresponding ##unextensible_mapping
+  {
+    ItemUuid = item_uuid;
+    AgencyId = agency_id;
+    TravelId = travel_id;
+    CarrierId = carrier_id;
+    ConnectionId = connection_id;
+    FlightDate = flight_date;
+    BookingId = booking_id;
+    PassengerFirstName = passenger_first_name;
+    PassengerLastName = passenger_last_name;
+    ChangedAt = changed_at;
+    ChangedBy = changed_by;
+    LocChangedAt = loc_changed_at;
+  }
+
 }

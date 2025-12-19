@@ -1,11 +1,18 @@
 @AccessControl.authorizationCheck: #NOT_REQUIRED
 @EndUserText.label: 'Flight Travel Item'
+@AbapCatalog.viewEnhancementCategory: [#PROJECTION_LIST]
+@AbapCatalog.extensibility: {
+ extensible: true,
+ allowNewDatasources: false,
+ dataSources: ['_Extension'],
+ elementSuffix: 'Z06'
+}
 define view entity Z06_R_TravelItem
   as select from z06_tritem
 
-  association to parent Z06_R_Travel as _Travel on  $projection.AgencyId = _Travel.AgencyId
-                                                and $projection.TravelId = _Travel.TravelId
-
+  association to parent Z06_R_Travel as _Travel    on  $projection.AgencyId = _Travel.AgencyId
+                                                   and $projection.TravelId = _Travel.TravelId
+  association to Z06_E_TravelItem    as _Extension on  $projection.ItemUuid = _Extension.ItemUuid
 {
   key item_uuid            as ItemUuid,
       agency_id            as AgencyId,
@@ -22,5 +29,6 @@ define view entity Z06_R_TravelItem
       changed_by           as ChangedBy,
       @Semantics.systemDateTime.localInstanceLastChangedAt: true
       loc_changed_at       as LocChangedAt,
-      _Travel
+      _Travel,
+      _Extension
 }

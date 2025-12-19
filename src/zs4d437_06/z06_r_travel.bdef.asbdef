@@ -3,6 +3,14 @@ strict ( 2 );
 
 with draft;
 
+extensible
+{
+ with additional save;
+ with validations on save;
+ with determinations on modify;
+ with determinations on save;
+}
+
 define behavior for Z06_R_Travel alias Travel
 persistent table z06_travel ##UNMAPPED_FIELD
 draft table z06_travel_d
@@ -11,6 +19,8 @@ total etag ChangedAt
 authorization master ( instance )
 etag master LocChangedAt //ChangedAt
 early numbering
+with additional save
+extensible
 {
   // Standard Operations
   create ( authorization : global );
@@ -22,12 +32,16 @@ early numbering
   //action cancel_travel;
   action ( features : instance ) cancel_travel;
 
+  // Event
+  event TravelCreated parameter Z06_A_Event;
+
   // Draft Action
   draft action Edit;
   draft action Activate optimized;
   draft action Discard;
   draft action Resume;
   draft determine action Prepare
+  extensible
   {
     validation validateDescription;
     validation validateCustomer;
@@ -125,7 +139,7 @@ early numbering
   }
 
   // Mapping
-  mapping for z06_travel corresponding
+  mapping for z06_travel corresponding ##UNEXTENSIBLE_MAPPING
     {
       AgencyID     = agency_ID;
       TravelID     = travel_id;
@@ -144,6 +158,7 @@ draft table z06_tritem_d
 authorization dependent by _Travel
 lock dependent by _Travel
 etag master LocChangedAt
+extensible
 {
   update;
   delete;
@@ -166,23 +181,23 @@ etag master LocChangedAt
   }
 
 
-//  mapping for z06_tritem corresponding
-//    {
-//      ItemUuid           = item_uuid;
-//      AgencyId           = agency_id;
-//      TravelId           = travel_id;
-//      CarrierId          = carrier_id;
-//      ConnectionId       = connection_id;
-//      FlightDate         = flight_date;
-//      BookingId          = booking_id;
-//      PassengerFirstName = passenger_first_name;
-//      PassengerLastName  = passenger_last_name;
-//      ChangedAt          = changed_at;
-//      ChangedBy          = changed_by;
-//      LocChangedAt       = loc_changed_at;
-//    }
+  mapping for z06_tritem corresponding ##UNEXTENSIBLE_MAPPING
+    {
+      ItemUuid           = item_uuid;
+      AgencyId           = agency_id;
+      TravelId           = travel_id;
+      CarrierId          = carrier_id;
+      ConnectionId       = connection_id;
+      FlightDate         = flight_date;
+      BookingId          = booking_id;
+      PassengerFirstName = passenger_first_name;
+      PassengerLastName  = passenger_last_name;
+      ChangedAt          = changed_at;
+      ChangedBy          = changed_by;
+      LocChangedAt       = loc_changed_at;
+    }
 
-  mapping for /lrn/437_s_tritem control /lrn/437_s_tritemx corresponding
+  mapping for /lrn/437_s_tritem control /lrn/437_s_tritemx corresponding ##UNEXTENSIBLE_MAPPING
     {
       ItemUuid           = item_uuid;
       AgencyId           = agency_id;

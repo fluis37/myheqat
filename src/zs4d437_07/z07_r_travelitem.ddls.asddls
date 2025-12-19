@@ -3,8 +3,10 @@
 define view entity Z07_R_TRAVELITEM
   as select from z07_tritem
   association to parent Z07_R_Travel as _Travel 
-  on $projection.AgencyId = _Travel.AgencyId 
-  and $projection.TravelId = _Travel.TravelId
+    on $projection.AgencyId = _Travel.AgencyId 
+    and $projection.TravelId = _Travel.TravelId
+  association to Z07_E_TravelItem as _Extension 
+    on $projection.ItemUuid = _Extension.ItemUuid
   {
     key item_uuid            as ItemUuid,
         agency_id            as AgencyId,
@@ -21,5 +23,6 @@ define view entity Z07_R_TRAVELITEM
         changed_by           as ChangedBy,
         @Semantics.systemDateTime.localInstanceLastChangedAt: true
         loc_changed_at       as LocChangedAt,
-        _Travel
+        _Travel,
+        _Extension
   }

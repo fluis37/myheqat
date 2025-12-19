@@ -26,9 +26,10 @@ define root view entity Z00_C_Travel
               element: [ 'CustomerName' ]
           }
       }
+            @UI.textArrangement: #TEXT_LAST
+      
       CustomerId,
       _Customer.CountryCode,
-      
       CustomerName,
       BeginDate,
       EndDate,

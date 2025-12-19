@@ -77,9 +77,10 @@ CLASS lsc_z00_r_travel IMPLEMENTATION.
                       )
              TO event_in.
       ENDLOOP.
-
       RAISE ENTITY EVENT z00_r_travel~travelcreated
           FROM event_in.
+
+
 
     ENDIF.
 

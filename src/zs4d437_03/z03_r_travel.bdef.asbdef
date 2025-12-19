@@ -2,6 +2,14 @@ managed implementation in class zbp_03_r_travel unique;
 strict ( 2 );
 with draft;
 
+extensible
+{
+  with additional save;
+  with determinations on modify;
+  with validations on save;
+  with determinations on save;
+}
+
 define behavior for Z03_R_Travel alias Travel
 persistent table z03_travel ##UNMAPPED_FIELD
 draft table z03_travel_d
@@ -11,6 +19,8 @@ authorization master ( instance )
 etag master LocChangeAt  //ChangeAt
 
 early numbering
+with additional save
+extensible
 {
   create ( authorization : global );
   update ( features : instance );
@@ -19,6 +29,9 @@ early numbering
   association _TravelItem { create; with draft; }
 
   action ( features : instance ) cancel_travel;
+
+  event TravelCreated parameter Z03_A_EVENT;
+
   draft action Resume;
   draft action Edit;
   draft action Discard;
@@ -35,6 +48,7 @@ early numbering
   determination determineStatus on modify { create; }
 
   draft determine action Prepare
+  extensible
   {
     validation validateCustomer;
     validation validateDescription;
@@ -76,8 +90,10 @@ early numbering
   field ( mandatory ) Description, EndDate;
   field ( features : instance ) CustomerId, BeginDate;
 
+
+
   //Mapping
-  mapping for z03_travel corresponding
+  mapping for z03_travel corresponding ##unextensible_mapping
     {
       AgencyId    = agency_id;
       TravelId    = travel_id;
@@ -97,6 +113,7 @@ draft table z03_tritem_d
 authorization dependent by _Travel
 lock dependent by _Travel
 etag master LocChangedAt
+extensible
 {
 
   delete;
@@ -110,7 +127,7 @@ etag master LocChangedAt
   validation validateFlightDate on save { create; field FlightDate; }
   determination determineTravelDates on save { field FlightDate; }
 
-  mapping for z03_tritem corresponding
+  mapping for z03_tritem corresponding ##unextensible_mapping
     {
       ItemUuid           = item_uuid;
       AgencyId           = agency_id;
@@ -126,7 +143,7 @@ etag master LocChangedAt
       LocChangedAt       = loc_changed_at;
     }
 
-  mapping for /lrn/437_s_tritem control /lrn/437_s_tritemx corresponding
+  mapping for /lrn/437_s_tritem control /lrn/437_s_tritemx corresponding ##unextensible_mapping
     {
       ItemUuid           = item_uuid;
       AgencyId           = agency_id;

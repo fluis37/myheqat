@@ -1,0 +1,18 @@
+CLASS lsc_Z00_R_TRAVEL DEFINITION INHERITING FROM cl_abap_behavior_saver.
+  PROTECTED SECTION.
+
+    METHODS save_modified REDEFINITION.
+
+    METHODS cleanup_finalize REDEFINITION.
+
+ENDCLASS.
+
+CLASS lsc_Z00_R_TRAVEL IMPLEMENTATION.
+
+  METHOD save_modified.
+  ENDMETHOD.
+
+  METHOD cleanup_finalize.
+  ENDMETHOD.
+
+ENDCLASS.

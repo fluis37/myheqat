@@ -1,0 +1,10 @@
+extension implementation in class zbp_01x_r_travel_class unique;
+
+extend behavior for Travel
+{
+}
+
+extend behavior for Item
+with additional save
+{
+}

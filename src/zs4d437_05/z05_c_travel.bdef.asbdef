@@ -2,6 +2,9 @@ projection;
 strict ( 2 );
 
 use draft;
+use side effects;
+
+extensible;
 define behavior for Z05_C_Travel alias ZTravel
 {
   use create;
@@ -28,6 +31,7 @@ define behavior for Z05_C_Travel alias ZTravel
 
 define behavior for Z05_C_TRAVELITEM
 use etag
+extensible
 {
 
   use update;

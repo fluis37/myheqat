@@ -1,0 +1,6 @@
+extension for projection;
+
+extend behavior for Z06_C_TravelItem
+{
+ use action ZZcheckClass;
+}

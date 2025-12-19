@@ -41,6 +41,34 @@ CLASS lsc_z08_r_travel IMPLEMENTATION.
       i_itemx = CORRESPONDING #( <item_u> MAPPING FROM ENTITY USING CONTROL ) ).
     ENDLOOP.
 
+*   Raise l'evenement TravelCreated
+    IF create-travel IS NOT INITIAL.
+      "Gestion sans paramètre
+*      RAISE ENTITY EVENT Z08_R_Travel~TravelCreated
+*        FROM CORRESPONDING #( create-travel ) .
+
+      "Gestion avec paramètre
+      DATA event_in TYPE TABLE FOR EVENT Z08_R_Travel~TravelCreated.
+      LOOP AT create-travel ASSIGNING FIELD-SYMBOL(<new_travel>).
+        APPEND VALUE #( AgencyId = <new_travel>-AgencyId
+                        TravelId = <new_travel>-TravelId
+                        origin = 'Z08_R_TRAVEL' ) TO event_in.
+      ENDLOOP.
+      RAISE ENTITY EVENT Z08_R_Travel~TravelCreated
+        FROM event_in.
+
+    ENDIF.
+
+    "Autre syntaxe
+*     IF create-travel IS NOT INITIAL.
+*       RAISE ENTITY EVENT Z08_R_Travel~TravelCreated
+*         FROM VALUE #( FOR <new_travel> IN create-travel
+*                        ( AgencyId = <new_travel>-AgencyId
+*                          TravelId = <new_travel>-TravelId
+*                          origin = 'Z08_R_TRAVEL' ) ).
+*     ENDIF.
+
+
   ENDMETHOD.
 
 ENDCLASS.

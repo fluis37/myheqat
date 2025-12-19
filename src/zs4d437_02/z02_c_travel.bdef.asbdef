@@ -4,8 +4,11 @@ strict ( 2 );
 use draft;
 use side effects;
 
+extensible;
+
 define behavior for Z02_C_Travel //alias <alias_name>
 use etag
+extensible
 {
   use create;
   use update;
@@ -30,6 +33,7 @@ use etag
 
 define behavior for Z02_C_TravelItem //alias TravelItem
 use etag
+extensible
 {
   use update;
   use delete;

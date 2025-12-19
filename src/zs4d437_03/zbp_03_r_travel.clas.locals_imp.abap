@@ -47,6 +47,22 @@ CLASS lsc_z03_r_travel IMPLEMENTATION.
                         TO reported-item.
       ENDIF.
     ENDLOOP.
+
+    IF create-travel IS NOT INITIAL.
+
+      DATA event_in TYPE TABLE FOR EVENT Z03_R_Travel~TravelCreated.
+
+      LOOP AT create-travel ASSIGNING FIELD-SYMBOL(<new_travel>).
+        APPEND VALUE #( AgencyId = <new_travel>-AgencyId
+                       TravelId = <new_travel>-TravelId
+                       origin = 'Z03_R_TRAVEL' )
+                       TO event_in.
+
+      ENDLOOP.
+
+      RAISE ENTITY EVENT Z03_R_Travel~TravelCreated
+            FROM event_in.
+    ENDIF.
   ENDMETHOD.
 
 

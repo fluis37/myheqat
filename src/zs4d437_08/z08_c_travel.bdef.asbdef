@@ -4,8 +4,11 @@ strict ( 2 );
 use draft;
 use side effects;
 
+extensible;
+
 define behavior for Z08_C_TRAVEL //alias <alias_name>
 use etag
+extensible
 {
   use create;
   use update;

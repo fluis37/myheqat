@@ -10,6 +10,7 @@ define root view entity Z01_R_TRAVEL
         customer_id as CustomerId,
         begin_date  as BeginDate,
         end_date    as EndDate,
+        @EndUserText.label: 'Duration (days)'
         dats_days_between( begin_date, end_date) as Duration  ,
         status      as Status,
         @Semantics.systemDateTime.lastChangedAt: true
